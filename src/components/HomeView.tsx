@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, PuzzleCategory, UserStats } from '../types';
-import { Zap, Swords, Flame, Sparkles, Brain, Cpu, Clock, Target, ArrowRight, Award, Trophy, ShieldAlert, Hourglass, Lock, Cloud, LogIn, RotateCcw, Heart, Volume2, VolumeX, User, Crown, CheckCircle2 } from 'lucide-react';
+import { Zap, Swords, Flame, Sparkles, Brain, Cpu, Clock, Target, ArrowRight, Award, Trophy, ShieldAlert, Hourglass, Lock, Cloud, LogIn, RotateCcw } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { getDailyChallenge } from '../utils/puzzleEngine';
-import { getLevelProgress, refillLivesFull } from '../utils/storage';
+import { getLevelProgress } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
 
 interface HomeViewProps {
   stats: UserStats;
-  onUpdateStats?: (newStats: UserStats) => void;
   onStartGame: (mode: GameMode, category?: PuzzleCategory) => void;
   onOpenDaily: () => void;
   onOpenBattle: () => void;
@@ -21,7 +20,6 @@ const ONE_HOUR_MS = 60 * 60 * 1000;
 
 export const HomeView: React.FC<HomeViewProps> = ({
   stats,
-  onUpdateStats,
   onStartGame,
   onOpenDaily,
   onOpenBattle,
@@ -31,7 +29,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
 }) => {
   const { user, isCloudSynced, setAuthModalOpen, setAuthModalMode } = useAuth();
   const [now, setNow] = useState<number>(Date.now());
-  const [showHeartInfo, setShowHeartInfo] = useState<boolean>(false);
   const { puzzle: dailyPuzzle, puzzleNumber } = getDailyChallenge(now);
   const { currentLevelXp, nextLevelXp, progressPercent } = getLevelProgress(stats.xp, stats.level);
 
@@ -53,229 +50,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
     return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
   };
 
-  const handleToggleSound = () => {
-    const nextState = !stats.soundEnabled;
-    sound.enabled = nextState;
-    if (nextState) sound.playClick();
-    if (onUpdateStats) {
-      onUpdateStats({ ...stats, soundEnabled: nextState });
-    }
-  };
-
-  const handleRefillLives = () => {
-    sound.playClick();
-    const updated = refillLivesFull(stats);
-    if (onUpdateStats) {
-      onUpdateStats(updated);
-    }
-    setShowHeartInfo(false);
-  };
-
   return (
     <div className="space-y-4 sm:space-y-6 pb-24 md:pb-12 text-slate-100 max-w-6xl mx-auto px-3 sm:px-6 pt-2 sm:pt-4">
-      
-      {/* 📱 Main Screen Interactive Status HUD (Visible on all screens & mobile) */}
-      <div className="bg-slate-900/95 border border-slate-800/90 rounded-2xl p-3 sm:p-4 shadow-xl">
-        <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400">Main Dashboard</span>
-            <div className={`w-2 h-2 rounded-full ${user ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
-          </div>
-          <div className="flex items-center gap-1.5">
-            {/* Direct Sound Toggle */}
-            <button
-              id="main-screen-toggle-sound"
-              onClick={handleToggleSound}
-              className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
-              title={stats.soundEnabled ? 'Mute Game Audio' : 'Enable Game Audio'}
-            >
-              {stats.soundEnabled ? (
-                <>
-                  <Volume2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-emerald-300 text-[11px]">Sound ON</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span className="text-rose-300 text-[11px]">Sound MUTED</span>
-                </>
-              )}
-            </button>
-
-            {/* Quick Pro Upgrade button */}
-            {!stats.isPro && (
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  onOpenPro();
-                }}
-                className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-[11px] font-black rounded-lg transition-transform active:scale-95 cursor-pointer shadow-sm"
-              >
-                <Crown className="w-3 h-3 fill-slate-950 shrink-0" />
-                <span>GO PRO</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* 4 Interactive Quick Stat Tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          {/* Tile 1: Lives */}
-          <button
-            onClick={() => {
-              sound.playClick();
-              setShowHeartInfo(!showHeartInfo);
-            }}
-            className="p-2.5 bg-slate-950/60 hover:bg-rose-950/30 border border-rose-900/30 hover:border-rose-700/50 rounded-xl flex items-center justify-between transition-colors cursor-pointer text-left group"
-          >
-            <div className="space-y-0.5">
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Lives Remaining</span>
-              <span className="text-sm font-black text-rose-200 group-hover:text-rose-100 flex items-center gap-1">
-                {stats.lives}/{stats.maxLives}
-                {stats.lives < stats.maxLives && <span className="text-[10px] text-amber-400 font-normal">+Refill</span>}
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center shrink-0">
-              <Heart className="w-4 h-4 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
-            </div>
-          </button>
-
-          {/* Tile 2: Day Streak */}
-          <div className="p-2.5 bg-slate-950/60 border border-amber-900/30 rounded-xl flex items-center justify-between text-left">
-            <div className="space-y-0.5">
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Daily Streak</span>
-              <span className="text-sm font-black text-amber-300">
-                {stats.streak} {stats.streak === 1 ? 'Day' : 'Days'} 🔥
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0">
-              <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-            </div>
-          </div>
-
-          {/* Tile 3: Player Level 1 & Tier */}
-          <button
-            onClick={() => {
-              sound.playClick();
-              onOpenProfile();
-            }}
-            className="p-2.5 bg-slate-950/60 hover:bg-indigo-950/30 border border-indigo-900/30 hover:border-indigo-700/50 rounded-xl flex items-center justify-between transition-colors cursor-pointer text-left group"
-          >
-            <div className="space-y-0.5">
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Player Rank</span>
-              <span className="text-sm font-black text-indigo-200 group-hover:text-indigo-100 truncate">
-                Lv.{stats.level} {stats.title}
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center shrink-0">
-              <span className="text-base">⭐</span>
-            </div>
-          </button>
-
-          {/* Tile 4: Sign In / Cloud Account */}
-          <button
-            onClick={() => {
-              sound.playClick();
-              if (!user) {
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              } else {
-                onOpenProfile();
-              }
-            }}
-            className="p-2.5 bg-slate-950/60 hover:bg-slate-800/80 border border-slate-700/60 hover:border-slate-600 rounded-xl flex items-center justify-between transition-colors cursor-pointer text-left group"
-          >
-            <div className="space-y-0.5 min-w-0">
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Cloud State</span>
-              <span className="text-xs font-black text-slate-200 group-hover:text-white truncate block">
-                {user ? user.displayName?.split(' ')[0] || 'Synced' : 'Tap to Sign In'}
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-              {user ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              ) : (
-                <LogIn className="w-4 h-4 text-indigo-400" />
-              )}
-            </div>
-          </button>
-        </div>
-
-        {/* Lives Refill Inline Card */}
-        {showHeartInfo && (
-          <div className="mt-2.5 p-3 bg-slate-950 border border-rose-900/50 rounded-xl space-y-2 text-xs animate-scale-up">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-bold text-rose-300">
-                <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                <span>Lives Inventory ({stats.lives}/{stats.maxLives})</span>
-              </div>
-              <button
-                onClick={() => setShowHeartInfo(false)}
-                className="text-slate-400 hover:text-white text-xs cursor-pointer px-1"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="text-[11px] text-slate-300">
-              Lives protect your streak. Free players regenerate 1 heart every 15 minutes.
-            </p>
-            {stats.lives < stats.maxLives && (
-              <button
-                onClick={handleRefillLives}
-                className="w-full py-1.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs rounded-lg shadow-sm transition-all cursor-pointer"
-              >
-                Instant Full Refill (+5 Lives)
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Top Banner Hero: Positioning Quote & Level Progress */}
+      {/* Top Banner Hero: Positioning Quote */}
       <div className="bg-gradient-to-br from-slate-900 via-indigo-950/70 to-slate-900 border border-indigo-900/40 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
         {/* Glow backdrop */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-1.5 sm:space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[11px] sm:text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span>The Addictive Daily Math Game</span>
-            </div>
-            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-white font-['Outfit'] leading-tight">
-              Engage with a daily puzzle, view real-time rankings, and connect with players globally.
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Solve fresh challenges (+10,000 XP), monitor live international solver leaderboards, and challenge mathematicians around the globe to real-time 1v1 duels.
-            </p>
+        <div className="relative z-10 space-y-2 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[11px] sm:text-xs font-semibold">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+            <span>The Addictive Daily Math Game</span>
           </div>
-
-          {/* Level Progress Widget */}
-          <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 sm:p-4 min-w-[260px] space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">CURRENT TIER</span>
-                <p className="text-sm sm:text-base font-extrabold text-white">{stats.title}</p>
-              </div>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-lg sm:text-xl font-bold">
-                {stats.level >= 50 ? '🥇' : stats.level >= 25 ? '🥈' : '🥉'}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-indigo-300 font-bold">Level {stats.level}</span>
-                <span className="text-slate-400 font-mono text-[11px]">
-                  {currentLevelXp.toLocaleString()} / {nextLevelXp.toLocaleString()} XP ({progressPercent}%)
-                </span>
-              </div>
-              <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
-                <div
-                  className="bg-gradient-to-r from-indigo-500 to-amber-400 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </div>
-          </div>
+          <h1 className="text-xl sm:text-3xl font-black tracking-tight text-white font-['Outfit'] leading-tight">
+            Engage with a daily puzzle, view real-time rankings, and connect with players globally.
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Solve fresh challenges (+10,000 XP), monitor live international solver leaderboards, and challenge mathematicians around the globe to real-time 1v1 duels.
+          </p>
         </div>
       </div>
 

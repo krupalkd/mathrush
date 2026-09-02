@@ -204,7 +204,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         executePendingAction();
       }
     } catch (err: unknown) {
-      console.error('Google Sign In Error:', err);
+      const anyErr = err as { code?: string; message?: string };
+      if (anyErr?.code === 'auth/popup-closed-by-user' || anyErr?.code === 'auth/cancelled-popup-request') {
+        // User closed or cancelled popup - handle cleanly without fatal error logging
+        return;
+      }
+      console.warn('Google Sign In Error:', err);
       throw err;
     }
   };
@@ -220,7 +225,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         executePendingAction();
       }
     } catch (err: unknown) {
-      console.error('Facebook Sign In Error:', err);
+      const anyErr = err as { code?: string; message?: string };
+      if (anyErr?.code === 'auth/popup-closed-by-user' || anyErr?.code === 'auth/cancelled-popup-request') {
+        // User closed or cancelled popup - handle cleanly without fatal error logging
+        return;
+      }
+      console.warn('Facebook Sign In Error:', err);
       throw err;
     }
   };

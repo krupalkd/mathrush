@@ -65,7 +65,7 @@ export const SignInGate: React.FC<SignInGateProps> = ({
               try {
                 await loginWithGoogle();
               } catch (e) {
-                console.error(e);
+                console.warn('Sign In Gate Google auth:', e);
               }
             }}
             className="w-full py-3 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-xl flex items-center justify-center gap-3 transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-98 text-sm"
@@ -98,7 +98,7 @@ export const SignInGate: React.FC<SignInGateProps> = ({
               try {
                 await loginWithFacebook();
               } catch (e) {
-                console.error(e);
+                console.warn('Sign In Gate Facebook auth:', e);
               }
             }}
             className="w-full py-3 px-4 bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold rounded-xl flex items-center justify-center gap-3 transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-98 text-sm"

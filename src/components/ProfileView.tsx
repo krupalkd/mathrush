@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserStats } from '../types';
 import { sound } from '../utils/audio';
-import { INITIAL_ACHIEVEMENTS, getLevelProgress, addXp } from '../utils/storage';
+import { INITIAL_ACHIEVEMENTS, getLevelProgress, addXp, refillLivesFull } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
 import {
   Trophy,
@@ -15,6 +15,8 @@ import {
   Check,
   Volume2,
   VolumeX,
+  Heart,
+  Crown,
   Bell,
   BellOff,
   BellRing,
@@ -66,6 +68,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     startFreshJourney,
   } = useAuth();
 
+  const [now, setNow] = useState<number>(Date.now());
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(stats.name);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -74,12 +77,43 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [testNotificationSent, setTestNotificationSent] = useState<boolean>(false);
 
   useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermissionStatus(Notification.permission);
     } else {
       setPermissionStatus('unsupported');
     }
   }, []);
+
+  const getRefillCountdown = (): string => {
+    if (stats.lives >= stats.maxLives) return '100% Full';
+    const REFILL_INTERVAL_MS = 10 * 60 * 1000;
+    const elapsed = now - (stats.lastLifeRefillTimestamp || now);
+    const remainingMs = Math.max(0, REFILL_INTERVAL_MS - (elapsed % REFILL_INTERVAL_MS));
+    const mins = Math.floor(remainingMs / 60000);
+    const secs = Math.floor((remainingMs % 60000) / 1000);
+    return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+  };
+
+  const handleRefillLives = () => {
+    sound.playClick();
+    const updated = refillLivesFull(stats);
+    onUpdateStats(updated);
+    confetti({ particleCount: 50, spread: 60 });
+  };
+
+  const handleToggleSound = () => {
+    const nextVal = stats.soundEnabled === false;
+    sound.enabled = nextVal;
+    if (nextVal) sound.playClick();
+    onUpdateStats({ ...stats, soundEnabled: nextVal });
+  };
 
   const handleRequestNotificationPermission = async () => {
     sound.playClick();
@@ -297,6 +331,244 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </div>
 
+      {/* 🎮 Core Player Hub: Dedicated Cards for Lives, Streaks, Level Progression & Volume */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+            Player Dashboard & Game Settings
+          </h2>
+          <span className="text-[11px] text-indigo-400 font-semibold">Live Real-time State</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {/* 1. 💖 Lives & Energy Reserve */}
+          <div className="bg-slate-900 border border-rose-900/40 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center shrink-0">
+                  <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Lives & Energy</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg font-black text-white">{stats.lives} / {stats.maxLives}</span>
+                    <span className="text-xs text-rose-300 font-bold">Hearts Available</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Heart Indicators */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: stats.maxLives }).map((_, i) => (
+                  <Heart
+                    key={i}
+                    className={`w-3.5 h-3.5 ${
+                      i < stats.lives
+                        ? 'text-rose-500 fill-rose-500'
+                        : 'text-slate-700 fill-slate-800'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl flex items-center justify-between gap-2 text-xs">
+              <div className="space-y-0.5">
+                <span className="text-[11px] text-slate-400 block font-medium">Refill Status</span>
+                <span className="font-bold text-amber-300">
+                  {stats.lives < stats.maxLives
+                    ? `Next Heart in ${getRefillCountdown()}`
+                    : '100% Full Energy (5/5)'}
+                </span>
+              </div>
+
+              {stats.lives < stats.maxLives ? (
+                <button
+                  id="profile-refill-lives-btn"
+                  onClick={handleRefillLives}
+                  className="px-3 py-1.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-black rounded-lg shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  ⚡ Free Full Refill
+                </button>
+              ) : (
+                <span className="text-[11px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-600/30 px-2 py-1 rounded-lg">
+                  Max Charged
+                </span>
+              )}
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              {stats.isPro ? (
+                <span className="text-amber-300 font-semibold">⭐ Pro Member: You have infinite stamina & instant refills.</span>
+              ) : (
+                <span>Hearts protect your streak during incorrect puzzle answers. Refills 1 heart every 10 minutes.</span>
+              )}
+            </p>
+          </div>
+
+          {/* 2. 🔥 Daily Streak & Momentum */}
+          <div className="bg-slate-900 border border-amber-900/40 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <Flame className="w-5 h-5 text-amber-400 fill-amber-400" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Daily Streak</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg font-black text-amber-300">{stats.streak} Days</span>
+                    <span className="text-xs text-slate-400 font-bold">Active</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] font-black text-amber-300">
+                🔥 Active
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-0.5">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Best Streak</span>
+                <span className="text-sm font-black text-white">{stats.maxStreak} Days Record</span>
+              </div>
+              <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-0.5">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Daily Reward</span>
+                <span className="text-sm font-black text-amber-300">+10,000 XP</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Solve the featured Daily Puzzle every 24 hours to build momentum and maintain global leaderboard placement.
+            </p>
+          </div>
+
+          {/* 3. ⭐ Level Progression & Rank */}
+          <div className="bg-slate-900 border border-indigo-900/40 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                  <span className="text-xl">⭐</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Rank Progression</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg font-black text-indigo-200">Level {stats.level}</span>
+                    <span className="text-xs text-indigo-400 font-bold">• {stats.title}</span>
+                  </div>
+                </div>
+              </div>
+
+              <span className="px-2.5 py-1 bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 rounded-lg text-xs font-black font-mono">
+                {stats.xp.toLocaleString()} XP
+              </span>
+            </div>
+
+            <div className="space-y-1.5 p-3 bg-slate-950/80 border border-slate-800 rounded-xl">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-indigo-300 font-bold">Level {stats.level} to {stats.level + 1}</span>
+                <span className="text-slate-400 font-mono text-[11px]">
+                  {currentLevelXp.toLocaleString()} / {nextLevelXp.toLocaleString()} XP ({progressPercent}%)
+                </span>
+              </div>
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
+                <div
+                  className="bg-gradient-to-r from-indigo-500 to-amber-400 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 block text-right font-medium">
+                {Math.max(0, nextLevelXp - currentLevelXp).toLocaleString()} XP needed for next level
+              </span>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Earn XP by completing daily math challenges (+10,000 XP) and winning 1v1 battle duels (+1,000 XP).
+            </p>
+          </div>
+
+          {/* 4. 🔊 Volume & Master Audio Controls */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${
+                  stats.soundEnabled !== false
+                    ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
+                    : 'bg-rose-500/20 border-rose-500/30 text-rose-400'
+                }`}>
+                  {stats.soundEnabled !== false ? (
+                    <Volume2 className="w-5 h-5" />
+                  ) : (
+                    <VolumeX className="w-5 h-5" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Game Audio & Volume</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-lg font-black ${
+                      stats.soundEnabled !== false ? 'text-emerald-300' : 'text-rose-300'
+                    }`}>
+                      {stats.soundEnabled !== false ? 'Sound ON' : 'Sound MUTED'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Direct Master Toggle */}
+              <button
+                id="profile-master-sound-toggle"
+                onClick={handleToggleSound}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black border transition-all active:scale-95 cursor-pointer shadow-sm ${
+                  stats.soundEnabled !== false
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                }`}
+              >
+                {stats.soundEnabled !== false ? '🔊 Mute Audio' : '🔈 Enable Sound'}
+              </button>
+            </div>
+
+            {/* Audio Sound Effect Testing Preview Buttons */}
+            <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Test Sound Synthesizer:</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  onClick={() => {
+                    if (!stats.soundEnabled) sound.enabled = true;
+                    sound.playClick();
+                  }}
+                  className="py-1 px-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 text-[10px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  Click FX
+                </button>
+                <button
+                  onClick={() => {
+                    if (!stats.soundEnabled) sound.enabled = true;
+                    sound.playOptionSelect();
+                  }}
+                  className="py-1 px-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-indigo-300 text-[10px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  Select FX
+                </button>
+                <button
+                  onClick={() => {
+                    if (!stats.soundEnabled) sound.enabled = true;
+                    sound.playBattleWin();
+                  }}
+                  className="py-1 px-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-amber-300 text-[10px] font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                >
+                  Victory FX
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Provides real-time dynamic acoustic synth feedback during calculation chains, timers, and multiplayer battle victories.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Cloud Account & Data Sync Card */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
@@ -473,43 +745,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
         )}
-      </div>
-
-      {/* Audio & Sound Preferences Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
-        <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
-          Audio & Feedback Preferences
-        </h3>
-
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            {stats.soundEnabled !== false ? (
-              <Volume2 className="w-4 h-4 text-amber-400" />
-            ) : (
-              <VolumeX className="w-4 h-4 text-slate-500" />
-            )}
-            <div>
-              <span className="text-slate-200 font-bold block">Sound Effects & Haptics</span>
-              <span className="text-[11px] text-slate-400">Audio feedback during calculations and duels</span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              const nextVal = stats.soundEnabled === false;
-              sound.enabled = nextVal;
-              if (nextVal) sound.playClick();
-              onUpdateStats({ ...stats, soundEnabled: nextVal });
-            }}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
-              stats.soundEnabled !== false
-                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                : 'bg-slate-800 text-slate-400 border-slate-700'
-            }`}
-          >
-            {stats.soundEnabled !== false ? 'Enabled' : 'Muted'}
-          </button>
-        </div>
       </div>
 
       {/* Browser Notification Permissions & Daily Streak Reminders Card */}
