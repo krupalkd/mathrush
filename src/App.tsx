@@ -134,7 +134,7 @@ function AppContent() {
       />
 
       {/* Main View Router */}
-      <main className="flex-1 w-full max-w-6xl mx-auto">
+      <main className="flex-1 w-full max-w-6xl mx-auto pb-28 md:pb-8">
         {currentTab === 'home' && (
           <HomeView
             stats={stats}
