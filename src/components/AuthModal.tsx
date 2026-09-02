@@ -32,6 +32,7 @@ export const AuthModal: React.FC = () => {
     resetPassword,
     loginAsGuest,
     startFreshJourney,
+    promptReason,
     user,
   } = useAuth();
 
@@ -226,6 +227,14 @@ export const AuthModal: React.FC = () => {
                 : 'Sync your game progress, battle rank, streaks, and XP across all devices.'}
             </p>
           </div>
+
+          {/* Gameplay Requirement Notice */}
+          {promptReason && authModalMode !== 'fresh' && (
+            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2.5 text-xs text-amber-200 animate-fade-in">
+              <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{promptReason}</span>
+            </div>
+          )}
 
           {/* Mode Switch Tabs */}
           {authModalMode !== 'fresh' && (

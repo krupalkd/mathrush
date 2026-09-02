@@ -12,10 +12,11 @@ import { ProfileView } from './components/ProfileView';
 import { ResultsModal } from './components/ResultsModal';
 import { ProModal } from './components/ProModal';
 import { AuthModal } from './components/AuthModal';
+import { SignInGate } from './components/SignInGate';
 import { StartupMetricsDrawer } from './components/StartupMetricsDrawer';
 
 function AppContent() {
-  const { stats, updateStats, loading } = useAuth();
+  const { user, stats, updateStats, loading, openAuthForGameplay } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [activeGameMode, setActiveGameMode] = useState<GameMode>('quick');
   const [selectedCategory, setSelectedCategory] = useState<PuzzleCategory | undefined>(undefined);
@@ -39,9 +40,42 @@ function AppContent() {
   }, [stats.soundEnabled, stats.hapticsEnabled]);
 
   const handleStartGame = (mode: GameMode, category?: PuzzleCategory) => {
+    if (!user) {
+      openAuthForGameplay(
+        () => {
+          setActiveGameMode(mode);
+          setSelectedCategory(category);
+          setCurrentTab('game');
+        },
+        'Sign in first to start gameplay, climb the leaderboards, and save your progress.'
+      );
+      return;
+    }
     setActiveGameMode(mode);
     setSelectedCategory(category);
     setCurrentTab('game');
+  };
+
+  const handleOpenDaily = () => {
+    if (!user) {
+      openAuthForGameplay(
+        () => setCurrentTab('daily'),
+        'Sign in first to solve the Daily Challenge and claim +10,000 XP.'
+      );
+      return;
+    }
+    setCurrentTab('daily');
+  };
+
+  const handleOpenBattle = () => {
+    if (!user) {
+      openAuthForGameplay(
+        () => setCurrentTab('battle'),
+        'Sign in first to duel opponents in the 1v1 Live Math Battle Arena.'
+      );
+      return;
+    }
+    setCurrentTab('battle');
   };
 
   const handleFinishGame = (results: {
@@ -77,6 +111,20 @@ function AppContent() {
         onUpdateStats={updateStats}
         currentTab={currentTab}
         onSelectTab={(tab) => {
+          if (tab === 'game' || tab === 'daily' || tab === 'battle') {
+            if (!user) {
+              openAuthForGameplay(
+                () => {
+                  if (tab === 'game' && !activeGameMode) {
+                    setActiveGameMode('quick');
+                  }
+                  setCurrentTab(tab);
+                },
+                'Sign in first to access MathRush gameplay and keep your streaks intact.'
+              );
+              return;
+            }
+          }
           if (tab === 'game' && !activeGameMode) {
             setActiveGameMode('quick');
           }
@@ -91,8 +139,8 @@ function AppContent() {
           <HomeView
             stats={stats}
             onStartGame={handleStartGame}
-            onOpenDaily={() => setCurrentTab('daily')}
-            onOpenBattle={() => setCurrentTab('battle')}
+            onOpenDaily={handleOpenDaily}
+            onOpenBattle={handleOpenBattle}
             onOpenLeaderboard={() => setCurrentTab('leaderboard')}
             onOpenProfile={() => setCurrentTab('profile')}
             onOpenPro={() => setShowProModal(true)}
@@ -100,32 +148,56 @@ function AppContent() {
         )}
 
         {currentTab === 'daily' && (
-          <DailyChallengeView
-            stats={stats}
-            onUpdateStats={updateStats}
-            onGoHome={() => setCurrentTab('home')}
-            onOpenBattle={() => setCurrentTab('battle')}
-          />
+          !user ? (
+            <SignInGate
+              title="Daily Challenge Locked"
+              subtitle="Please sign in to solve today's high-stakes arithmetic puzzle, earn +10,000 XP, and maintain your streak."
+              onGoBack={() => setCurrentTab('home')}
+            />
+          ) : (
+            <DailyChallengeView
+              stats={stats}
+              onUpdateStats={updateStats}
+              onGoHome={() => setCurrentTab('home')}
+              onOpenBattle={handleOpenBattle}
+            />
+          )
         )}
 
         {currentTab === 'game' && (
-          <GameView
-            mode={activeGameMode}
-            initialCategory={selectedCategory}
-            stats={stats}
-            onUpdateStats={updateStats}
-            onFinishGame={handleFinishGame}
-            onExitGame={() => setCurrentTab('home')}
-            onOpenPro={() => setShowProModal(true)}
-          />
+          !user ? (
+            <SignInGate
+              title="Gameplay Locked"
+              subtitle="Sign in to play MathRush, choose any speed or focus mode, and record your high scores."
+              onGoBack={() => setCurrentTab('home')}
+            />
+          ) : (
+            <GameView
+              mode={activeGameMode}
+              initialCategory={selectedCategory}
+              stats={stats}
+              onUpdateStats={updateStats}
+              onFinishGame={handleFinishGame}
+              onExitGame={() => setCurrentTab('home')}
+              onOpenPro={() => setShowProModal(true)}
+            />
+          )
         )}
 
         {currentTab === 'battle' && (
-          <MathBattleView
-            stats={stats}
-            onUpdateStats={updateStats}
-            onBack={() => setCurrentTab('home')}
-          />
+          !user ? (
+            <SignInGate
+              title="Math Battle Arena Locked"
+              subtitle="Sign in with your player account to matchmake and duel live competitors in real-time math duels."
+              onGoBack={() => setCurrentTab('home')}
+            />
+          ) : (
+            <MathBattleView
+              stats={stats}
+              onUpdateStats={updateStats}
+              onBack={() => setCurrentTab('home')}
+            />
+          )
         )}
 
         {currentTab === 'leaderboard' && (

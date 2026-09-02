@@ -34,6 +34,9 @@ interface AuthContextType {
   setAuthModalOpen: (open: boolean) => void;
   authModalMode: 'signin' | 'signup' | 'reset' | 'fresh';
   setAuthModalMode: (mode: 'signin' | 'signup' | 'reset' | 'fresh') => void;
+  promptReason: string | null;
+  setPromptReason: (reason: string | null) => void;
+  openAuthForGameplay: (pendingAction?: () => void, customReason?: string) => void;
   updateStats: (newStats: UserStats, immediateCloudSave?: boolean) => void;
   loginWithGoogle: () => Promise<void>;
   loginWithFacebook: () => Promise<void>;
@@ -57,10 +60,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCloudSynced, setIsCloudSynced] = useState<boolean>(false);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup' | 'reset' | 'fresh'>('signin');
-
+  const [promptReason, setPromptReason] = useState<string | null>(null);
+  const pendingActionRef = useRef<(() => void) | null>(null);
   const statsRef = useRef<UserStats>(stats);
   statsRef.current = stats;
-
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync stats to Firestore with debounce
@@ -168,6 +171,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  // Open Auth modal specifically for gameplay
+  const openAuthForGameplay = useCallback((pendingAction?: () => void, customReason?: string) => {
+    sound.playClick();
+    if (pendingAction) {
+      pendingActionRef.current = pendingAction;
+    }
+    setPromptReason(customReason || 'Sign in with Google, Facebook, or Email to start playing and save your progress to the cloud.');
+    setAuthModalMode('signin');
+    setAuthModalOpen(true);
+  }, []);
+
+  const executePendingAction = () => {
+    if (pendingActionRef.current) {
+      const action = pendingActionRef.current;
+      pendingActionRef.current = null;
+      setTimeout(() => {
+        action();
+      }, 100);
+    }
+    setPromptReason(null);
+  };
+
   // Google Sign In
   const loginWithGoogle = async () => {
     try {
@@ -176,6 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result.user) {
         sound.playBattleWin();
         setAuthModalOpen(false);
+        executePendingAction();
       }
     } catch (err: unknown) {
       console.error('Google Sign In Error:', err);
@@ -191,6 +217,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result.user) {
         sound.playBattleWin();
         setAuthModalOpen(false);
+        executePendingAction();
       }
     } catch (err: unknown) {
       console.error('Facebook Sign In Error:', err);
@@ -206,6 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result.user) {
         sound.playBattleWin();
         setAuthModalOpen(false);
+        executePendingAction();
       }
     } catch (err: unknown) {
       console.error('Email Sign In Error:', err);
@@ -224,6 +252,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         sound.playBattleWin();
         setAuthModalOpen(false);
+        executePendingAction();
       }
     } catch (err: unknown) {
       console.error('Email Registration Error:', err);
@@ -250,6 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result.user) {
         sound.playOptionSelect();
         setAuthModalOpen(false);
+        executePendingAction();
       }
     } catch (err: unknown) {
       console.error('Guest Sign In Error:', err);
@@ -305,6 +335,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthModalOpen,
         authModalMode,
         setAuthModalMode,
+        promptReason,
+        setPromptReason,
+        openAuthForGameplay,
         updateStats,
         loginWithGoogle,
         loginWithFacebook,
