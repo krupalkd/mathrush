@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserStats } from '../types';
+import { GameMode, PuzzleCategory, UserStats } from '../types';
 import {
   Flame,
   Heart,
@@ -16,6 +16,7 @@ import {
   CloudCheck,
   LogIn,
   RotateCcw,
+  Gamepad2,
 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { refillLivesFull } from '../utils/storage';
@@ -27,6 +28,8 @@ interface NavbarProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
   onOpenPro: () => void;
+  activeGameMode?: GameMode;
+  selectedCategory?: PuzzleCategory;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -35,11 +38,43 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   onSelectTab,
   onOpenPro,
+  activeGameMode = 'quick',
+  selectedCategory,
 }) => {
   const { user, profile, isCloudSynced, isSaving, setAuthModalOpen, setAuthModalMode } = useAuth();
   const [showHeartTooltip, setShowHeartTooltip] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [refillCountdown, setRefillCountdown] = useState('');
+
+  // Helper to format active game / board name
+  const getActiveGameTitle = (): { name: string; icon: string; highlight?: boolean } => {
+    switch (currentTab) {
+      case 'home':
+        return { name: 'Mainboard', icon: '🎮', highlight: true };
+      case 'game':
+        if (activeGameMode === 'quick') return { name: 'Quick Rush', icon: '⚡' };
+        if (activeGameMode === 'streak') return { name: 'Survival Streak', icon: '🔥' };
+        if (activeGameMode === 'brain') return { name: 'Memory Matrix', icon: '🧠' };
+        if (activeGameMode === 'adaptive') return { name: 'Adaptive Speed IQ', icon: '🎯' };
+        if (activeGameMode === 'daily') return { name: 'Daily Challenge', icon: '✨' };
+        if (activeGameMode === 'battle') return { name: '1v1 Math Duel', icon: '⚔️' };
+        return { name: 'Math Game', icon: '🎮' };
+      case 'battle':
+        return { name: '1v1 Battle Arena', icon: '⚔️' };
+      case 'daily':
+        return { name: 'Daily Puzzle', icon: '✨' };
+      case 'leaderboard':
+        return { name: 'Global Ranks', icon: '🏆' };
+      case 'profile':
+        return { name: 'Player Profile', icon: '👤' };
+      case 'results':
+        return { name: 'Match Summary', icon: '📊' };
+      default:
+        return { name: 'MathRush Game', icon: '⚡' };
+    }
+  };
+
+  const activeInfo = getActiveGameTitle();
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -78,30 +113,53 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white transition-all shadow-md">
       {/* Primary Top Bar */}
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 h-12 sm:h-14 md:h-16 flex items-center justify-between gap-2">
-        {/* Brand Logo */}
-        <button
-          id="btn-brand-home"
-          onClick={() => {
-            sound.playClick();
-            onSelectTab('home');
-          }}
-          className="flex items-center gap-2 group cursor-pointer focus:outline-none text-left shrink-0"
-        >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg sm:rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-400 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <Zap className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white fill-white" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base sm:text-lg md:text-xl tracking-tight text-white font-['Outfit']">MathRush</span>
-              {stats.isPro && (
-                <span className="px-1.5 py-0.2 sm:py-0.5 text-[9px] sm:text-[10px] font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded uppercase tracking-wider">
-                  PRO
-                </span>
-              )}
+        {/* Brand Logo & Game Name Header */}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            id="btn-brand-home"
+            onClick={() => {
+              sound.playClick();
+              onSelectTab('home');
+            }}
+            className="flex items-center gap-2 group cursor-pointer focus:outline-none text-left"
+            title="MathRush - Return to Game Mainboard"
+          >
+            <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg sm:rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-400 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
+              <Zap className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white fill-white" />
             </div>
-            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium hidden sm:block leading-none">Faster Brain, Daily</p>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-sm sm:text-base md:text-lg tracking-tight text-white font-['Outfit']">
+                  MathRush
+                </span>
+                <span className="hidden xs:inline-flex px-1.5 py-0.2 sm:py-0.5 text-[9px] sm:text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded uppercase tracking-wider">
+                  Game
+                </span>
+                {stats.isPro && (
+                  <span className="px-1.5 py-0.2 sm:py-0.5 text-[9px] sm:text-[10px] font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded uppercase tracking-wider">
+                    PRO
+                  </span>
+                )}
+              </div>
+              <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium hidden sm:block leading-none">
+                Speed Mental Math Arena
+              </p>
+            </div>
+          </button>
+
+          {/* Active Mainboard / Game Mode Indicator Chip */}
+          <div
+            id="navbar-active-game-indicator"
+            className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
+              currentTab === 'home'
+                ? 'bg-indigo-950/60 border-indigo-700/50 text-indigo-200'
+                : 'bg-slate-800/80 border-slate-700 text-slate-300'
+            }`}
+          >
+            <span>{activeInfo.icon}</span>
+            <span className="text-white font-black">{activeInfo.name}</span>
           </div>
-        </button>
+        </div>
 
         {/* Center Navigation Links for Desktop */}
         <nav className="hidden md:flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
@@ -117,38 +175,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
             }`}
           >
-            <Home className="w-3.5 h-3.5" />
-            Home
-          </button>
-          <button
-            id="nav-tab-battle"
-            onClick={() => {
-              sound.playClick();
-              onSelectTab('battle');
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              currentTab === 'battle'
-                ? 'bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-sm'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-            }`}
-          >
-            <Swords className="w-3.5 h-3.5 text-amber-300" />
-            Math Battle
-          </button>
-          <button
-            id="nav-tab-daily"
-            onClick={() => {
-              sound.playClick();
-              onSelectTab('daily');
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              currentTab === 'daily'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Daily Puzzle
+            <Gamepad2 className="w-3.5 h-3.5" />
+            Mainboard
           </button>
           <button
             id="nav-tab-leaderboard"
@@ -368,80 +396,53 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile Bottom Navigation Bar with Full Icons & Unclipped Labels */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-4 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">
         <button
+          id="btn-mobile-nav-mainboard"
           onClick={() => {
             sound.playClick();
             onSelectTab('home');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all cursor-pointer min-w-[56px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
             currentTab === 'home'
               ? 'bg-indigo-600/20 text-indigo-400 font-black'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Home className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] tracking-tight leading-none">Home</span>
+          <Gamepad2 className="w-5 h-5 shrink-0" />
+          <span className="text-[11px] tracking-tight leading-none font-bold">Mainboard</span>
         </button>
 
         <button
-          onClick={() => {
-            sound.playClick();
-            onSelectTab('battle');
-          }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all cursor-pointer min-w-[56px] ${
-            currentTab === 'battle'
-              ? 'bg-rose-600/20 text-rose-400 font-black'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Swords className="w-5 h-5 text-amber-300 shrink-0" />
-          <span className="text-[10px] tracking-tight leading-none">Battle</span>
-        </button>
-
-        <button
-          onClick={() => {
-            sound.playClick();
-            onSelectTab('daily');
-          }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all cursor-pointer min-w-[56px] ${
-            currentTab === 'daily'
-              ? 'bg-amber-600/20 text-amber-400 font-black'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
-          <span className="text-[10px] tracking-tight leading-none">Daily</span>
-        </button>
-
-        <button
+          id="btn-mobile-nav-ranks"
           onClick={() => {
             sound.playClick();
             onSelectTab('leaderboard');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all cursor-pointer min-w-[56px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
             currentTab === 'leaderboard'
               ? 'bg-indigo-600/20 text-indigo-400 font-black'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Trophy className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] tracking-tight leading-none">Ranks</span>
+          <span className="text-[11px] tracking-tight leading-none font-bold">Ranks</span>
         </button>
 
         <button
+          id="btn-mobile-nav-profile"
           onClick={() => {
             sound.playClick();
             onSelectTab('profile');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all cursor-pointer min-w-[56px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
             currentTab === 'profile'
               ? 'bg-indigo-600/20 text-indigo-400 font-black'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <User className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] tracking-tight leading-none">Profile</span>
+          <span className="text-[11px] tracking-tight leading-none font-bold">Profile</span>
         </button>
       </div>
     </header>

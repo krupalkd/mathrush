@@ -110,6 +110,8 @@ function AppContent() {
         stats={stats}
         onUpdateStats={updateStats}
         currentTab={currentTab}
+        activeGameMode={activeGameMode}
+        selectedCategory={selectedCategory}
         onSelectTab={(tab) => {
           if (tab === 'game' || tab === 'daily' || tab === 'battle') {
             if (!user) {
