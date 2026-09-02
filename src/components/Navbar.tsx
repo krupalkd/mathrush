@@ -212,35 +212,37 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Status Bars & Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Hearts / Lives (Desktop view) */}
-          <div className="relative hidden md:block">
+          {/* Hearts / Lives indicator (Visible on all screen sizes) */}
+          <div className="relative">
             <button
               id="btn-hearts-indicator"
               onClick={() => setShowHeartTooltip(!showHeartTooltip)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-rose-950/50 border border-rose-800/40 rounded-lg hover:border-rose-600/60 transition-colors cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-rose-950/60 border border-rose-800/50 rounded-lg hover:border-rose-500/70 transition-colors cursor-pointer"
               title="Lives remaining"
             >
-              <Heart className="w-4 h-4 text-rose-500 fill-rose-500 animate-pulse" />
-              <span className="font-bold text-xs text-rose-200">
+              <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500 fill-rose-500 shrink-0" />
+              <span className="font-black text-[11px] sm:text-xs text-rose-200">
                 {stats.lives}/{stats.maxLives}
               </span>
             </button>
 
             {showHeartTooltip && (
-              <div className="absolute right-0 mt-2 w-56 p-3.5 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 text-xs">
+              <div className="absolute right-0 mt-2 w-60 p-3.5 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 text-xs animate-scale-up">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-white">❤️ Lives Status</span>
-                  <span className="text-rose-400 font-bold">{stats.lives}/{stats.maxLives}</span>
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> Lives Energy
+                  </span>
+                  <span className="text-rose-400 font-extrabold">{stats.lives}/{stats.maxLives}</span>
                 </div>
-                <p className="text-slate-300 text-[11px] mb-2.5">
+                <p className="text-slate-300 text-[11px] mb-2.5 leading-relaxed">
                   {stats.lives < stats.maxLives
                     ? `Next heart refilling in ${refillCountdown}`
-                    : 'Your energy is completely full!'}
+                    : 'Your lives energy is 100% full!'}
                 </p>
                 {stats.lives < stats.maxLives && (
                   <button
                     onClick={handleRefillLives}
-                    className="w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer"
+                    className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-lg text-xs transition-colors cursor-pointer shadow-md"
                   >
                     ⚡ Instant Refill (Free)
                   </button>
@@ -251,11 +253,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Daily Streak (Desktop view) */}
           <div
-            className="hidden md:flex items-center gap-1 px-2.5 py-1.5 bg-amber-950/40 border border-amber-800/40 rounded-lg"
+            className="hidden sm:flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-amber-950/40 border border-amber-800/40 rounded-lg"
             title={`${stats.streak} day streak!`}
           >
-            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span className="font-extrabold text-xs text-amber-300">{stats.streak}</span>
+            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 fill-amber-500 shrink-0" />
+            <span className="font-black text-xs text-amber-300">{stats.streak}</span>
           </div>
 
           {/* Level Badge (Desktop view) */}
@@ -292,7 +294,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="btn-toggle-sound"
             onClick={toggleSound}
-            className="w-8 h-8 sm:w-9 sm:h-9 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/80 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/80 transition-colors cursor-pointer flex items-center justify-center shrink-0"
             title={stats.soundEnabled ? 'Sound is ON (Click to Mute)' : 'Sound is MUTED (Click to Unmute)'}
             aria-label={stats.soundEnabled ? 'Mute Audio' : 'Unmute Audio'}
           >
@@ -386,63 +388,66 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setAuthModalMode('signin');
                 setAuthModalOpen(true);
               }}
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-lg shadow-sm shadow-indigo-600/30 transition-all cursor-pointer shrink-0 active:scale-95"
+              className="flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-[11px] sm:text-xs rounded-lg shadow-sm shadow-indigo-600/30 transition-all cursor-pointer shrink-0 active:scale-95"
             >
               <LogIn className="w-3.5 h-3.5 shrink-0" />
-              <span className="font-bold">Sign In</span>
+              <span className="font-extrabold">Sign In</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Mobile Bottom Navigation Bar with Full Icons & Unclipped Labels */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-4 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-xl border-t border-slate-800 px-3 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">
         <button
           id="btn-mobile-nav-mainboard"
+          type="button"
           onClick={() => {
             sound.playClick();
             onSelectTab('home');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3.5 rounded-xl transition-all cursor-pointer min-w-[76px] ${
             currentTab === 'home'
-              ? 'bg-indigo-600/20 text-indigo-400 font-black'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-indigo-600/25 border border-indigo-500/40 text-indigo-300 font-black shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 border border-transparent'
           }`}
         >
           <Gamepad2 className="w-5 h-5 shrink-0" />
-          <span className="text-[11px] tracking-tight leading-none font-bold">Mainboard</span>
+          <span className="text-[11px] font-black tracking-normal leading-tight">Mainboard</span>
         </button>
 
         <button
           id="btn-mobile-nav-ranks"
+          type="button"
           onClick={() => {
             sound.playClick();
             onSelectTab('leaderboard');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3.5 rounded-xl transition-all cursor-pointer min-w-[76px] ${
             currentTab === 'leaderboard'
-              ? 'bg-indigo-600/20 text-indigo-400 font-black'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-indigo-600/25 border border-indigo-500/40 text-indigo-300 font-black shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 border border-transparent'
           }`}
         >
           <Trophy className="w-5 h-5 shrink-0" />
-          <span className="text-[11px] tracking-tight leading-none font-bold">Ranks</span>
+          <span className="text-[11px] font-black tracking-normal leading-tight">Ranks</span>
         </button>
 
         <button
           id="btn-mobile-nav-profile"
+          type="button"
           onClick={() => {
             sound.playClick();
             onSelectTab('profile');
           }}
-          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[70px] ${
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3.5 rounded-xl transition-all cursor-pointer min-w-[76px] ${
             currentTab === 'profile'
-              ? 'bg-indigo-600/20 text-indigo-400 font-black'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-indigo-600/25 border border-indigo-500/40 text-indigo-300 font-black shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 border border-transparent'
           }`}
         >
           <User className="w-5 h-5 shrink-0" />
-          <span className="text-[11px] tracking-tight leading-none font-bold">Profile</span>
+          <span className="text-[11px] font-black tracking-normal leading-tight">Profile</span>
         </button>
       </div>
     </header>

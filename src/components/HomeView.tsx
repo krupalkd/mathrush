@@ -51,47 +51,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-24 md:pb-12 text-slate-100 max-w-6xl mx-auto px-3 sm:px-6 pt-2 sm:pt-4">
+    <div className="space-y-3.5 sm:space-y-6 pb-28 md:pb-12 text-slate-100 max-w-6xl mx-auto px-3 sm:px-6 pt-2 sm:pt-4">
       {/* Top Banner Hero: Positioning Quote */}
-      <div className="bg-gradient-to-br from-slate-900 via-indigo-950/70 to-slate-900 border border-indigo-900/40 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950/70 to-slate-900 border border-indigo-900/50 rounded-2xl p-3.5 sm:p-6 shadow-xl relative overflow-hidden">
         {/* Glow backdrop */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-2 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[11px] sm:text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span>The Addictive Daily Math Game</span>
+        <div className="relative z-10 space-y-1.5 sm:space-y-2 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] sm:text-xs font-bold">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400 shrink-0" />
+            <span>The Daily Math Game</span>
           </div>
-          <h1 className="text-xl sm:text-3xl font-black tracking-tight text-white font-['Outfit'] leading-tight">
-            Engage with a daily puzzle, view real-time rankings, and connect with players globally.
+          <h1 className="text-base sm:text-2xl md:text-3xl font-black tracking-tight text-white font-['Outfit'] leading-snug">
+            Engage with daily puzzles, view real-time rankings, and challenge players globally.
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Solve fresh challenges (+10,000 XP), monitor live international solver leaderboards, and challenge mathematicians around the globe to real-time 1v1 duels.
+          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+            Solve fresh challenges (+10,000 XP), monitor live international solver leaderboards, and enter speed 1v1 duels.
           </p>
         </div>
       </div>
 
       {/* Cloud Sync & Account Bar (if not signed in) */}
       {!user && (
-        <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="p-3 sm:p-4 bg-indigo-950/50 border border-indigo-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs shadow-md">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 shrink-0">
+            <div className="p-2 rounded-xl bg-indigo-600/25 text-indigo-400 shrink-0">
               <Cloud className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-white block">Sign In to Save Your Game Progress</span>
-              <span className="text-[11px] text-slate-300">
-                Sync with Google, Facebook, or Email to keep your XP, streaks, and Rank across all devices.
+              <span className="font-black text-white text-xs sm:text-sm block">Save Your MathRush Progress</span>
+              <span className="text-[11px] text-slate-300 font-medium">
+                Sync your XP, streaks, and global rank across Android and desktop.
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <button
               onClick={() => {
                 sound.playClick();
                 setAuthModalMode('signin');
                 setAuthModalOpen(true);
               }}
-              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+              className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>Sign In</span>
@@ -102,7 +102,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 setAuthModalMode('fresh');
                 setAuthModalOpen(true);
               }}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
+              className="flex-1 sm:flex-none px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 text-xs"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Start Fresh</span>
@@ -112,16 +112,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
       )}
 
       {/* Featured Daily Challenge Hero Card Banner */}
-      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-orange-950/30 border-2 border-amber-500/40 hover:border-amber-400/70 rounded-2xl p-5 sm:p-6 shadow-lg transition-all relative overflow-hidden group">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 text-xs font-black tracking-wider bg-amber-500 text-slate-950 rounded-md uppercase flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-slate-950" />
+      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-orange-950/30 border-2 border-amber-500/40 hover:border-amber-400/70 rounded-2xl p-4 sm:p-6 shadow-lg transition-all relative overflow-hidden group">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="px-2.5 py-0.5 text-[10px] sm:text-xs font-black tracking-wider bg-amber-500 text-slate-950 rounded uppercase flex items-center gap-1">
+                <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-slate-950" />
                 <span>Daily Challenge</span>
               </span>
-              <span className="text-xs text-amber-300/90 font-semibold font-mono">Puzzle #{puzzleNumber}</span>
-              <span className="text-xs text-slate-400">• 60s Clock</span>
+              <span className="text-[11px] sm:text-xs text-amber-300 font-bold font-mono">Puzzle #{puzzleNumber}</span>
+              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">• 60s Clock</span>
               {isCooldownActive && (
                 <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">
                   ⏳ Cooldown Active
@@ -129,22 +129,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
               )}
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-black text-white font-['JetBrains_Mono'] tracking-wide">
+            <h2 className="text-lg sm:text-2xl font-black text-white font-['JetBrains_Mono'] tracking-wide">
               {dailyPuzzle.question}
             </h2>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 pt-1">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-300 pt-0.5">
               <span className="flex items-center gap-1 text-emerald-400 font-bold">
                 <Trophy className="w-3.5 h-3.5 text-emerald-400" /> Reward: +10,000 XP
               </span>
-              <span className="text-slate-500">•</span>
-              <span className="text-rose-300 flex items-center gap-1 font-semibold">
+              <span className="text-slate-500 hidden sm:inline">•</span>
+              <span className="text-rose-300 flex items-center gap-1 font-bold">
                 <ShieldAlert className="w-3.5 h-3.5 text-rose-400" /> Miss: -1,000 XP
               </span>
-              <span className="text-slate-500">•</span>
-              <span className="text-amber-300/90 flex items-center gap-1 font-mono">
+              <span className="text-slate-500 hidden sm:inline">•</span>
+              <span className="text-amber-300 flex items-center gap-1 font-mono font-semibold">
                 <Hourglass className="w-3.5 h-3.5 text-amber-400" />
-                {isCooldownActive ? `Next: ${formatCooldown(remainingCooldownMs)}` : 'Fresh Hourly Rotation'}
+                {isCooldownActive ? `Next: ${formatCooldown(remainingCooldownMs)}` : 'Hourly Rotation'}
               </span>
             </div>
           </div>
@@ -155,7 +155,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               sound.playClick();
               onOpenDaily();
             }}
-            className={`px-6 py-3.5 font-black text-sm rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform group-hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap ${
+            className={`w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 font-black text-xs sm:text-sm rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-95 cursor-pointer whitespace-nowrap ${
               isCooldownActive
                 ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 shadow-slate-950/40'
                 : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/20'
@@ -164,7 +164,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {isCooldownActive ? (
               <>
                 <Lock className="w-4 h-4 text-amber-400" />
-                <span>Review / {formatCooldown(remainingCooldownMs)}</span>
+                <span>Review ({formatCooldown(remainingCooldownMs)})</span>
               </>
             ) : (
               <>
@@ -177,19 +177,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* Primary Game Modes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         {/* 1. Killer Feature: Math Battle */}
         <div
           onClick={() => {
             sound.playClick();
             onOpenBattle();
           }}
-          className="bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 border border-rose-800/40 hover:border-rose-500/80 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-rose-900/20 hover:-translate-y-1 group relative overflow-hidden flex flex-col justify-between"
+          className="bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 border border-rose-800/50 hover:border-rose-500/80 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-rose-900/20 active:scale-[0.99] group relative overflow-hidden flex flex-col justify-between"
         >
           <div>
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-orange-500 flex items-center justify-center shadow-md shadow-rose-600/30 group-hover:scale-110 transition-transform">
-                <Swords className="w-6 h-6 text-white" />
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-orange-500 flex items-center justify-center shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform shrink-0">
+                <Swords className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
 
               <span className="px-2.5 py-1 text-[10px] font-black tracking-wider uppercase bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-lg flex items-center gap-1.5">
@@ -198,20 +198,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className="text-lg font-black text-white font-['Outfit']">Math Battle (1v1 Duel)</h3>
-            </div>
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">
+              Math Battle (1v1 Duel)
+            </h3>
 
-            <div className="space-y-2 mb-4">
-              <p className="text-xs text-slate-300 line-clamp-2">
-                1v1 Speed Battle: Both players receive the same puzzle. Win duels to claim <strong>+1,000 XP</strong> per victory.
+            <div className="space-y-2 mb-3">
+              <p className="text-xs text-slate-300 font-medium line-clamp-2">
+                Speed Battle: Match with online players on the same puzzle. Win duels to claim <strong>+1,000 XP</strong>.
               </p>
 
               {/* Battle Record Summary Box */}
               <div className="bg-slate-950/90 border border-rose-900/50 rounded-xl p-2.5 space-y-1">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400 font-bold flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-amber-400 fill-amber-400" /> Current Arena XP:
+                    <Zap className="w-3 h-3 text-amber-400 fill-amber-400" /> Arena XP Earned:
                   </span>
                   <span className="font-black font-mono text-amber-400 text-xs">
                     +{(stats.battleWins * 1000).toLocaleString()} XP
@@ -219,8 +219,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-mono pt-1 border-t border-slate-900">
-                  <span className="text-slate-400 text-[10px]">Battle Record:</span>
-                  <span className="font-bold text-slate-200">
+                  <span className="text-slate-400 text-[10px] font-medium">Record:</span>
+                  <span className="font-extrabold text-slate-200">
                     <strong className="text-emerald-400">{stats.battleWins}W</strong> - <strong className="text-rose-400">{stats.battleLosses}L</strong>
                   </span>
                 </div>
@@ -228,13 +228,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-rose-400 group-hover:text-rose-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-rose-400 group-hover:text-rose-300">
             <span className="flex items-center gap-1 font-mono">
               <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <strong className="text-white">+{(stats.battleWins * 1000).toLocaleString()} XP</strong>
-              <span className="text-slate-400 font-normal">({stats.battleWins}W / {stats.battleLosses}L)</span>
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 font-bold">
               Enter Duel <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </div>
@@ -246,23 +245,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             sound.playClick();
             onStartGame('quick');
           }}
-          className="bg-slate-900/90 border border-slate-800 hover:border-indigo-500/70 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-indigo-900/20 hover:-translate-y-1 group relative"
+          className="bg-slate-900/90 border border-slate-800 hover:border-indigo-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-indigo-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center shadow-md shadow-indigo-600/30 group-hover:scale-110 transition-transform">
-              <Zap className="w-6 h-6 text-white fill-white" />
+          <div>
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center shadow-md shadow-indigo-600/30 group-hover:scale-105 transition-transform shrink-0">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 rounded-md">
+                Speed Sprint
+              </span>
             </div>
-            <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 rounded-md">
-              Speed Sprint
-            </span>
+
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">Quick Math</h3>
+            <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
+              10 questions against a 30-second rapid clock. Chain combos to earn massive multiplier XP!
+            </p>
           </div>
 
-          <h3 className="text-lg font-black text-white font-['Outfit'] mb-1">Quick Math</h3>
-          <p className="text-xs text-slate-300 mb-4 line-clamp-2">
-            10 questions against a 30-second rapid clock. Chain combos to earn massive multiplier XP!
-          </p>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-indigo-400 group-hover:text-indigo-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-indigo-400 group-hover:text-indigo-300">
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> 30s Sprint
             </span>
@@ -278,23 +279,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             sound.playClick();
             onStartGame('streak');
           }}
-          className="bg-slate-900/90 border border-slate-800 hover:border-amber-500/70 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-amber-900/20 hover:-translate-y-1 group relative"
+          className="bg-slate-900/90 border border-slate-800 hover:border-amber-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-amber-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-110 transition-transform">
-              <Flame className="w-6 h-6 text-white fill-white" />
+          <div>
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
+                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-md">
+                High Stakes
+              </span>
             </div>
-            <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-md">
-              High Stakes
-            </span>
+
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">Streak Mode</h3>
+            <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
+              Solve consecutive questions without making a single mistake. How high can your streak climb?
+            </p>
           </div>
 
-          <h3 className="text-lg font-black text-white font-['Outfit'] mb-1">Streak Mode</h3>
-          <p className="text-xs text-slate-300 mb-4 line-clamp-2">
-            Solve consecutive questions without making a single mistake. How far can your mind climb?
-          </p>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-amber-400 group-hover:text-amber-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-amber-400 group-hover:text-amber-300">
             <span className="flex items-center gap-1">
               <Target className="w-3.5 h-3.5" /> Best: {stats.bestStreakScore} in a row
             </span>
@@ -310,23 +313,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             sound.playClick();
             onStartGame('brain', 'logic');
           }}
-          className="bg-slate-900/90 border border-slate-800 hover:border-emerald-500/70 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-emerald-900/20 hover:-translate-y-1 group relative"
+          className="bg-slate-900/90 border border-slate-800 hover:border-emerald-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-emerald-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-600/30 group-hover:scale-110 transition-transform">
-              <Brain className="w-6 h-6 text-white" />
+          <div>
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-600/30 group-hover:scale-105 transition-transform shrink-0">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-md">
+                Logic & Equations
+              </span>
             </div>
-            <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-md">
-              Logic & Equations
-            </span>
+
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">Brain Puzzles</h3>
+            <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
+              Multi-step logic riddles, visual fruit balance equations, and tricky sequence reasoning.
+            </p>
           </div>
 
-          <h3 className="text-lg font-black text-white font-['Outfit'] mb-1">Brain Puzzles</h3>
-          <p className="text-xs text-slate-300 mb-4 line-clamp-2">
-            Multi-step logic riddles, visual fruit balance equations, and tricky sequence reasoning.
-          </p>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-emerald-400 group-hover:text-emerald-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-emerald-400 group-hover:text-emerald-300">
             <span className="flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" /> Step-by-Step Hints
             </span>
@@ -342,23 +347,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             sound.playClick();
             onStartGame('adaptive');
           }}
-          className="bg-slate-900/90 border border-slate-800 hover:border-purple-500/70 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-purple-900/20 hover:-translate-y-1 group relative"
+          className="bg-slate-900/90 border border-slate-800 hover:border-purple-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-purple-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-purple-600/30 group-hover:scale-110 transition-transform">
-              <Cpu className="w-6 h-6 text-white" />
+          <div>
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform shrink-0">
+                <Cpu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-md">
+                AI Powered
+              </span>
             </div>
-            <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-md">
-              AI Powered
-            </span>
+
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">AI Adaptive Trainer</h3>
+            <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
+              Auto-tunes difficulty based on your exact accuracy ({stats.accuracyRate}%) and speed ({stats.avgTimeSeconds}s).
+            </p>
           </div>
 
-          <h3 className="text-lg font-black text-white font-['Outfit'] mb-1">AI Adaptive Trainer</h3>
-          <p className="text-xs text-slate-300 mb-4 line-clamp-2">
-            Auto-tunes difficulty based on your exact accuracy ({stats.accuracyRate}%) and speed ({stats.avgTimeSeconds}s).
-          </p>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-purple-400 group-hover:text-purple-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-purple-400 group-hover:text-purple-300">
             <span>Adaptive Engine</span>
             <span className="flex items-center gap-1">
               Start <ArrowRight className="w-3.5 h-3.5" />
@@ -372,23 +379,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
             sound.playClick();
             onOpenPro();
           }}
-          className="bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 border border-amber-800/40 hover:border-amber-500/70 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:shadow-amber-900/20 hover:-translate-y-1 group relative"
+          className="bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 border border-amber-800/40 hover:border-amber-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-amber-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-110 transition-transform">
-              <Award className="w-6 h-6 text-slate-950 font-black" />
+          <div>
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
+                <Award className="w-6 h-6 text-slate-950 font-black" />
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-amber-500 text-slate-950 rounded-md">
+                {stats.isPro ? 'ACTIVE PRO' : '₹99/MO'}
+              </span>
             </div>
-            <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-amber-500 text-slate-950 rounded-md">
-              {stats.isPro ? 'ACTIVE PRO' : '₹99/MO'}
-            </span>
+
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">MathRush Pro</h3>
+            <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
+              Unlock unlimited hints, detailed speed analytics, AI tutor explanations, and exclusive Master puzzles.
+            </p>
           </div>
 
-          <h3 className="text-lg font-black text-white font-['Outfit'] mb-1">MathRush Pro</h3>
-          <p className="text-xs text-slate-300 mb-4 line-clamp-2">
-            Unlock unlimited hints, detailed speed analytics, AI tutor explanations, and exclusive Master puzzles.
-          </p>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-semibold text-amber-400 group-hover:text-amber-300">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-amber-400 group-hover:text-amber-300">
             <span>{stats.isPro ? 'Manage Membership' : 'Explore Pro Perks'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
@@ -396,44 +405,44 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-lg font-bold">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-base sm:text-lg font-bold shrink-0">
             🧠
           </div>
-          <div>
-            <span className="text-[11px] text-slate-400 block font-medium">Puzzles Solved</span>
-            <span className="text-base font-extrabold text-white">{stats.puzzlesSolved}</span>
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block font-bold truncate">Puzzles Solved</span>
+            <span className="text-sm sm:text-base font-black text-white">{stats.puzzlesSolved}</span>
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-lg font-bold">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-base sm:text-lg font-bold shrink-0">
             🎯
           </div>
-          <div>
-            <span className="text-[11px] text-slate-400 block font-medium">Accuracy</span>
-            <span className="text-base font-extrabold text-white">{stats.accuracyRate}%</span>
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block font-bold truncate">Accuracy</span>
+            <span className="text-sm sm:text-base font-black text-white">{stats.accuracyRate}%</span>
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center text-lg font-bold">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center text-base sm:text-lg font-bold shrink-0">
             ⚡
           </div>
-          <div>
-            <span className="text-[11px] text-slate-400 block font-medium">Avg Solve Time</span>
-            <span className="text-base font-extrabold text-white">{stats.avgTimeSeconds}s</span>
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block font-bold truncate">Avg Speed</span>
+            <span className="text-sm sm:text-base font-black text-white">{stats.avgTimeSeconds}s</span>
           </div>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-rose-600/20 text-rose-400 flex items-center justify-center text-lg font-bold">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-rose-600/20 text-rose-400 flex items-center justify-center text-base sm:text-lg font-bold shrink-0">
             ⚔️
           </div>
-          <div>
-            <span className="text-[11px] text-slate-400 block font-medium">Battle XP Record</span>
-            <span className="text-base font-extrabold text-amber-400 font-mono">
+          <div className="min-w-0">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block font-bold truncate">Arena Record</span>
+            <span className="text-xs sm:text-sm font-black text-amber-400 font-mono truncate block">
               +{(stats.battleWins * 1000).toLocaleString()} XP
             </span>
           </div>

@@ -9,14 +9,38 @@
   .animate-shake {
     animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
   }
+  
+  /* Android & Mobile UI utilities */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .safe-bottom-padding {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 body {
   margin: 0;
   background-color: #020617;
   color: #f8fafc;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
+
+/* Ensure buttons and interactive elements have comfortable touch response on Android */
+button, a, input, select {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 
 
