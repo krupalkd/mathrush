@@ -138,6 +138,7 @@ function AppContent() {
         {currentTab === 'home' && (
           <HomeView
             stats={stats}
+            onUpdateStats={updateStats}
             onStartGame={handleStartGame}
             onOpenDaily={handleOpenDaily}
             onOpenBattle={handleOpenBattle}
