@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email" },
+        "displayName": { "type": "string", "description": "Display name" },
+        "photoURL": { "type": "string", "description": "Profile avatar URL" },
+        "authProvider": { "type": "string", "description": "google, facebook, email, anonymous" },
+        "stats": { "type": "object", "description": "Player game stats, XP, level, streak, lives, history" },
+        "updatedAt": { "type": "number", "description": "Timestamp of last sync" },
+        "createdAt": { "type": "number", "description": "Timestamp of creation" }
+      }
+    },
+    "LeaderboardEntry": {
+      "collection": "leaderboard",
+      "fields": {
+        "uid": { "type": "string", "description": "User UID" },
+        "name": { "type": "string", "description": "Player display name" },
+        "avatar": { "type": "string", "description": "Avatar icon" },
+        "xp": { "type": "number", "description": "Total XP" },
+        "level": { "type": "number", "description": "Current player level" },
+        "title": { "type": "string", "description": "Rank title" },
+        "battleElo": { "type": "number", "description": "Elo rating" },
+        "updatedAt": { "type": "number", "description": "Last updated timestamp" }
+      }
+    }
+  }
+}

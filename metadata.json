@@ -1,0 +1,8 @@
+{
+  "name": "MathRush",
+  "description": "Daily math puzzles, rapid calculation drills, streak mode, and real-time 1v1 Math Battles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
