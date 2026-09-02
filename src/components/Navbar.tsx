@@ -77,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white transition-all shadow-md">
       {/* Primary Top Bar */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 h-12 sm:h-14 md:h-16 flex items-center justify-between gap-2">
         {/* Brand Logo */}
         <button
           id="btn-brand-home"
@@ -87,19 +87,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           }}
           className="flex items-center gap-2 group cursor-pointer focus:outline-none text-left shrink-0"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-400 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white" />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg sm:rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-400 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <Zap className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white fill-white" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white font-['Outfit']">MathRush</span>
+              <span className="font-extrabold text-base sm:text-lg md:text-xl tracking-tight text-white font-['Outfit']">MathRush</span>
               {stats.isPro && (
-                <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded uppercase tracking-wider">
+                <span className="px-1.5 py-0.2 sm:py-0.5 text-[9px] sm:text-[10px] font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded uppercase tracking-wider">
                   PRO
                 </span>
               )}
             </div>
-            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium hidden sm:block">Faster Brain, Daily</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium hidden sm:block leading-none">Faster Brain, Daily</p>
           </div>
         </button>
 
@@ -183,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right Status Bars & Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Hearts / Lives (Desktop view) */}
           <div className="relative hidden md:block">
             <button
@@ -252,10 +252,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 sound.playClick();
                 onOpenPro();
               }}
-              className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-[11px] sm:text-xs rounded-lg shadow-sm transition-all transform active:scale-95 cursor-pointer shrink-0"
+              className="flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-[10px] sm:text-xs rounded-lg shadow-sm transition-all transform active:scale-95 cursor-pointer shrink-0"
               title="Upgrade to Pro"
             >
-              <Crown className="w-3.5 h-3.5 fill-slate-950 shrink-0" />
+              <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-slate-950 shrink-0" />
               <span>PRO</span>
             </button>
           ) : null}
@@ -264,14 +264,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="btn-toggle-sound"
             onClick={toggleSound}
-            className="w-9 h-9 sm:w-10 sm:h-10 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl border border-slate-700 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+            className="w-8 h-8 sm:w-9 sm:h-9 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/80 transition-colors cursor-pointer flex items-center justify-center shrink-0"
             title={stats.soundEnabled ? 'Sound is ON (Click to Mute)' : 'Sound is MUTED (Click to Unmute)'}
             aria-label={stats.soundEnabled ? 'Mute Audio' : 'Unmute Audio'}
           >
             {stats.soundEnabled ? (
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
+              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
             ) : (
-              <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400 shrink-0" />
+              <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 shrink-0" />
             )}
           </button>
 
@@ -284,10 +284,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   sound.playClick();
                   setShowUserMenu(!showUserMenu);
                 }}
-                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-colors cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 rounded-lg transition-colors cursor-pointer shrink-0"
                 title={user.email || user.displayName || 'Cloud Account'}
               >
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-xs overflow-hidden shrink-0 border border-indigo-400/40">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] sm:text-xs overflow-hidden shrink-0 border border-indigo-400/40">
                   {user.photoURL ? (
                     <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -295,11 +295,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs font-bold text-slate-200 hidden sm:inline max-w-[70px] truncate">
+                  <span className="text-[11px] sm:text-xs font-bold text-slate-200 hidden sm:inline max-w-[70px] truncate">
                     {user.displayName?.split(' ')[0] || stats.name}
                   </span>
                   <div
-                    className={`w-2 h-2 rounded-full shrink-0 ${
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0 ${
                       isSaving
                         ? 'bg-amber-400 animate-ping'
                         : isCloudSynced
@@ -358,7 +358,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setAuthModalMode('signin');
                 setAuthModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-sm shadow-indigo-600/30 transition-all cursor-pointer shrink-0 active:scale-95"
+              className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-lg shadow-sm shadow-indigo-600/30 transition-all cursor-pointer shrink-0 active:scale-95"
             >
               <LogIn className="w-3.5 h-3.5 shrink-0" />
               <span className="font-bold">Sign In</span>
@@ -366,109 +366,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
       </div>
-
-      {/* Dedicated Mobile Status Ribbon: Full 4-Column Grid for Lives, Streaks, Level 1, Cloud Status */}
-      <div className="md:hidden border-t border-slate-800/80 bg-slate-950/95 px-2.5 py-1.5">
-        <div className="grid grid-cols-4 gap-1.5 text-xs">
-          {/* 1. Lives / Hearts Indicator */}
-          <button
-            id="btn-mobile-lives"
-            onClick={() => {
-              sound.playClick();
-              setShowHeartTooltip(!showHeartTooltip);
-            }}
-            className="flex items-center justify-center gap-1 py-1.5 px-1 bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 rounded-lg active:scale-95 transition-all cursor-pointer"
-            title="Lives remaining"
-          >
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 animate-pulse shrink-0" />
-            <span className="font-extrabold text-[11px] text-rose-200">
-              {stats.lives}/{stats.maxLives}
-            </span>
-          </button>
-
-          {/* 2. Day Streaks */}
-          <div
-            id="btn-mobile-streak"
-            className="flex items-center justify-center gap-1 py-1.5 px-1 bg-amber-950/40 border border-amber-800/40 rounded-lg"
-            title={`${stats.streak} day streak!`}
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
-            <span className="font-extrabold text-[11px] text-amber-300 truncate">
-              {stats.streak} Streak
-            </span>
-          </div>
-
-          {/* 3. Level 1 / Current Level */}
-          <button
-            id="btn-mobile-level"
-            onClick={() => {
-              sound.playClick();
-              onSelectTab('profile');
-            }}
-            className="flex items-center justify-center gap-1 py-1.5 px-1 bg-indigo-950/50 hover:bg-indigo-900/50 border border-indigo-800/40 rounded-lg active:scale-95 transition-all cursor-pointer"
-            title="Player Level"
-          >
-            <span className="text-[11px] shrink-0">⭐</span>
-            <span className="font-extrabold text-[11px] text-indigo-200">
-              Lv.{stats.level}
-            </span>
-          </button>
-
-          {/* 4. Cloud / Sign-in Status */}
-          <button
-            id="btn-mobile-cloud-status"
-            onClick={() => {
-              sound.playClick();
-              if (!user) {
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              } else {
-                onSelectTab('profile');
-              }
-            }}
-            className="flex items-center justify-center gap-1 py-1.5 px-1 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 rounded-lg active:scale-95 transition-all cursor-pointer"
-            title={user ? 'Cloud Synced' : 'Click to Sign In'}
-          >
-            <Cloud className={`w-3.5 h-3.5 shrink-0 ${user ? 'text-emerald-400' : 'text-slate-400'}`} />
-            <span className={`font-bold text-[10px] truncate ${user ? 'text-emerald-300' : 'text-slate-300'}`}>
-              {user ? 'Synced' : 'Guest'}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Hearts Refill Tooltip Popover */}
-      {showHeartTooltip && (
-        <div className="md:hidden px-3 py-2 bg-slate-900 border-b border-slate-800 animate-scale-up">
-          <div className="p-3 bg-slate-800/95 border border-slate-700 rounded-xl space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-white flex items-center gap-1.5">
-                <Heart className="w-4 h-4 text-rose-500 fill-rose-500 shrink-0" />
-                <span>Lives Status ({stats.lives}/{stats.maxLives})</span>
-              </span>
-              <button
-                onClick={() => setShowHeartTooltip(false)}
-                className="text-slate-400 hover:text-white text-xs px-1 cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="text-slate-300 text-[11px]">
-              {stats.lives < stats.maxLives
-                ? `Next heart refilling in ${refillCountdown}`
-                : 'Your energy is at full capacity!'}
-            </p>
-            {stats.lives < stats.maxLives && (
-              <button
-                onClick={handleRefillLives}
-                className="w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer"
-              >
-                ⚡ Instant Refill (Free)
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Mobile Bottom Navigation Bar with Full Icons & Unclipped Labels */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl">

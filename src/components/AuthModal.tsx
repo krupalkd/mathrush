@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { sound } from '../utils/audio';
 import {
@@ -44,14 +44,26 @@ export const AuthModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  if (!authModalOpen) return null;
-
   const handleClose = () => {
     sound.playClick();
     setErrorMessage(null);
     setSuccessMessage(null);
     setAuthModalOpen(false);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && authModalOpen) {
+        handleClose();
+      }
+    };
+    if (authModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [authModalOpen]);
+
+  if (!authModalOpen) return null;
 
   const parseAuthError = (err: unknown): string => {
     if (!err || typeof err !== 'object') return 'An unexpected error occurred. Please try again.';
@@ -185,34 +197,41 @@ export const AuthModal: React.FC = () => {
   return (
     <div
       id="auth-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
       <div
         id="auth-modal-container"
-        className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative text-white animate-scale-up"
+        className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative text-white animate-scale-up my-auto max-h-[92vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Background Glow */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-indigo-600/20 via-purple-600/10 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-indigo-600/20 via-purple-600/10 to-transparent pointer-events-none" />
 
-        {/* Modal Close Button */}
+        {/* Modal Close Button - High Priority Z-Index */}
         <button
           id="btn-close-auth-modal"
-          onClick={handleClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-full transition-colors z-10 cursor-pointer"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClose();
+          }}
+          className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 w-8 h-8 sm:w-9 sm:h-9 text-slate-400 hover:text-white bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 rounded-full flex items-center justify-center transition-all z-30 cursor-pointer border border-slate-700/80 shadow-md active:scale-90"
+          aria-label="Close modal"
+          title="Close (Esc)"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
-        <div className="p-6 sm:p-7 relative z-10 space-y-5">
+        <div className="p-4 sm:p-5 relative z-10 space-y-3.5 overflow-y-auto">
           {/* Header Title & Branding */}
-          <div className="text-center space-y-1.5 pt-1">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-indigo-500/30">
-              <Zap className="w-6 h-6 text-white fill-white" />
+          <div className="text-center space-y-1 pt-0.5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-amber-400 flex items-center justify-center mx-auto shadow-md shadow-indigo-500/25">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white" />
             </div>
-            <h2 className="text-2xl font-black text-white font-['Outfit'] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-black text-white font-['Outfit'] tracking-tight">
               {authModalMode === 'signup'
                 ? 'Create MathRush Account'
                 : authModalMode === 'reset'
@@ -221,7 +240,7 @@ export const AuthModal: React.FC = () => {
                 ? 'Start Fresh Process'
                 : 'Sign In to MathRush'}
             </h2>
-            <p className="text-xs text-slate-400 max-w-xs mx-auto">
+            <p className="text-[11px] sm:text-xs text-slate-400 max-w-xs mx-auto leading-tight">
               {authModalMode === 'fresh'
                 ? 'Begin a fresh journey at Level 1 with full cloud persistence.'
                 : 'Sync your game progress, battle rank, streaks, and XP across all devices.'}
@@ -230,9 +249,9 @@ export const AuthModal: React.FC = () => {
 
           {/* Gameplay Requirement Notice */}
           {promptReason && authModalMode !== 'fresh' && (
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2.5 text-xs text-amber-200 animate-fade-in">
-              <Zap className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>{promptReason}</span>
+            <div className="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2 text-xs text-amber-200 animate-fade-in">
+              <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="text-[11px]">{promptReason}</span>
             </div>
           )}
 
@@ -248,7 +267,7 @@ export const AuthModal: React.FC = () => {
                   setSuccessMessage(null);
                   setAuthModalMode('signin');
                 }}
-                className={`py-2 rounded-lg transition-all cursor-pointer ${
+                className={`py-1.5 rounded-lg transition-all cursor-pointer ${
                   authModalMode === 'signin'
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-white'
@@ -265,7 +284,7 @@ export const AuthModal: React.FC = () => {
                   setSuccessMessage(null);
                   setAuthModalMode('signup');
                 }}
-                className={`py-2 rounded-lg transition-all cursor-pointer ${
+                className={`py-1.5 rounded-lg transition-all cursor-pointer ${
                   authModalMode === 'signup'
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-white'
@@ -278,55 +297,55 @@ export const AuthModal: React.FC = () => {
 
           {/* Error & Success Messages */}
           {errorMessage && (
-            <div className="p-3 bg-rose-950/80 border border-rose-600/50 rounded-xl text-xs text-rose-200 flex items-start gap-2.5">
+            <div className="p-2.5 bg-rose-950/80 border border-rose-600/50 rounded-xl text-xs text-rose-200 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+              <span className="text-[11px]">{errorMessage}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-3 bg-emerald-950/80 border border-emerald-600/50 rounded-xl text-xs text-emerald-200 flex items-start gap-2.5">
+            <div className="p-2.5 bg-emerald-950/80 border border-emerald-600/50 rounded-xl text-xs text-emerald-200 flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <span>{successMessage}</span>
+              <span className="text-[11px]">{successMessage}</span>
             </div>
           )}
 
           {/* Mode: Start Fresh Process */}
           {authModalMode === 'fresh' ? (
-            <div className="space-y-4 bg-slate-950/70 border border-slate-800 rounded-2xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  <RotateCcw className="w-5 h-5" />
+            <div className="space-y-3 bg-slate-950/70 border border-slate-800 rounded-xl p-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <RotateCcw className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white">Start Fresh Process</h4>
-                  <p className="text-xs text-slate-400">
+                  <h4 className="text-xs font-black text-white">Start Fresh Process</h4>
+                  <p className="text-[10px] text-slate-400">
                     Reset player progress to Level 1, 0 XP, 3 lives, and save cleanly to cloud.
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                <label className="text-[10px] font-bold text-slate-300 block mb-1">
                   Choose Player Nickname
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder={user?.displayName || 'e.g. MathNinja_101'}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => setAuthModalMode('signin')}
-                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -335,23 +354,23 @@ export const AuthModal: React.FC = () => {
                   id="btn-confirm-start-fresh"
                   onClick={handleStartFreshAction}
                   disabled={isLoading}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50"
+                  className="flex-1 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-md transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {isLoading ? 'Resetting...' : 'Start Fresh Now'}
+                  {isLoading ? 'Resetting...' : 'Start Fresh'}
                 </button>
               </div>
             </div>
           ) : (
             <>
               {/* Social Auth Providers (Google & Facebook) */}
-              <div className="space-y-2.5">
+              <div className="grid grid-cols-1 gap-2">
                 {/* Google Sign In Button */}
                 <button
                   id="btn-auth-google"
                   type="button"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
-                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-md cursor-pointer disabled:opacity-60"
+                  className="w-full py-2 px-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] shadow-sm cursor-pointer disabled:opacity-60"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path
@@ -380,7 +399,7 @@ export const AuthModal: React.FC = () => {
                   type="button"
                   onClick={handleFacebookAuth}
                   disabled={isLoading}
-                  className="w-full py-2.5 px-4 bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-md cursor-pointer disabled:opacity-60"
+                  className="w-full py-2 px-3 bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] shadow-sm cursor-pointer disabled:opacity-60"
                 >
                   <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -390,41 +409,41 @@ export const AuthModal: React.FC = () => {
               </div>
 
               {/* Divider */}
-              <div className="relative flex items-center justify-center">
+              <div className="relative flex items-center justify-center my-0.5">
                 <div className="border-t border-slate-800 w-full" />
-                <span className="bg-slate-900 px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <span className="bg-slate-900 px-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   or with email
                 </span>
                 <div className="border-t border-slate-800 w-full" />
               </div>
 
               {/* Email Form */}
-              <form onSubmit={handleSubmitEmail} className="space-y-3">
+              <form onSubmit={handleSubmitEmail} className="space-y-2.5">
                 {authModalMode === 'signup' && (
                   <div>
-                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                    <label className="text-[10px] font-bold text-slate-300 block mb-1">
                       Display Name
                     </label>
                     <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         id="input-signup-name"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         placeholder="Your Player Nickname"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                  <label className="text-[10px] font-bold text-slate-300 block mb-1">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       id="input-auth-email"
@@ -432,7 +451,7 @@ export const AuthModal: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="ninja@mathrush.io"
                       required
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -440,7 +459,7 @@ export const AuthModal: React.FC = () => {
                 {authModalMode !== 'reset' && (
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] font-bold text-slate-300">Password</label>
+                      <label className="text-[10px] font-bold text-slate-300">Password</label>
                       {authModalMode === 'signin' && (
                         <button
                           type="button"
@@ -456,7 +475,7 @@ export const AuthModal: React.FC = () => {
                       )}
                     </div>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         id="input-auth-password"
@@ -464,14 +483,14 @@ export const AuthModal: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-9 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </div>
@@ -481,21 +500,21 @@ export const AuthModal: React.FC = () => {
                   type="submit"
                   id="btn-auth-submit-email"
                   disabled={isLoading}
-                  className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60"
+                  className="w-full py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60 mt-1"
                 >
                   {isLoading ? (
                     <span>Please wait...</span>
                   ) : authModalMode === 'signup' ? (
                     <>
                       <span>Sign Up with Email</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   ) : authModalMode === 'reset' ? (
                     <span>Send Reset Email</span>
                   ) : (
                     <>
                       <span>Sign In with Email</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>
@@ -508,7 +527,7 @@ export const AuthModal: React.FC = () => {
                   id="btn-guest-mode"
                   onClick={handleGuestMode}
                   disabled={isLoading}
-                  className="hover:text-slate-200 transition-colors font-medium flex items-center gap-1 cursor-pointer"
+                  className="hover:text-slate-200 transition-colors font-medium flex items-center gap-1 cursor-pointer text-[11px]"
                 >
                   <span>Play as Guest</span>
                 </button>
@@ -522,10 +541,10 @@ export const AuthModal: React.FC = () => {
                     setSuccessMessage(null);
                     setAuthModalMode('fresh');
                   }}
-                  className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
+                  className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer text-[11px]"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Start Fresh Process</span>
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Start Fresh</span>
                 </button>
               </div>
             </>
