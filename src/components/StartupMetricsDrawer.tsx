@@ -14,7 +14,7 @@ export const StartupMetricsDrawer: React.FC<StartupMetricsDrawerProps> = ({ stat
       {/* Floating Blueprint Badge */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 md:bottom-5 right-4 z-30 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/50 text-indigo-300 hover:text-white rounded-full text-xs font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105"
+        className="fixed bottom-24 md:bottom-5 right-4 z-30 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 border border-indigo-500/50 text-indigo-300 hover:text-white rounded-full text-xs font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105"
         title="View Startup Blueprint & Live Metrics"
       >
         <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
