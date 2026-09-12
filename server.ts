@@ -103,7 +103,7 @@ Also provide a 1-sentence hint and a clear 2-3 step explanation.`;
 
     let response;
     try {
-      response = await generateWithModel("gemini-3.7-flash");
+      response = await generateWithModel("gemini-3.8-flash");
     } catch (primaryErr) {
       // If primary model is unavailable or overloaded (e.g. 503 spike), fallback to flash-lite
       try {
@@ -155,7 +155,7 @@ Give a 2-3 sentence encouraging, crystal-clear explanation of why ${correctAnswe
     let responseText = "";
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.7-flash",
+        model: "gemini-3.8-flash",
         contents: prompt,
       });
       responseText = response.text?.trim() || "";
