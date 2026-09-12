@@ -216,8 +216,13 @@ export const CURATED_PUZZLES: Puzzle[] = [
 
 // Procedural generator to guarantee infinite fresh questions
 export function generateProceduralPuzzle(difficulty: DifficultyLevel = 'medium', category?: PuzzleCategory): Puzzle {
-  const chosenCat = category || getRandomCategory();
   const id = `gen-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
+  if (difficulty === 'master') {
+    return generateMasterOlympiad(id);
+  }
+
+  const chosenCat = category || getRandomCategory();
 
   if (chosenCat === 'bodmas') {
     return generateBODMAS(id, difficulty);
@@ -229,6 +234,114 @@ export function generateProceduralPuzzle(difficulty: DifficultyLevel = 'medium',
     return generateEquationFiller(id, difficulty);
   } else {
     return generateArithmeticLogic(id, difficulty);
+  }
+}
+
+function generateMasterOlympiad(id: string): Puzzle {
+  const subtype = randInt(1, 4);
+  if (subtype === 1) {
+    // Difference of squares: (n+d)^2 - (n-d)^2 = 4*n*d
+    const n = randInt(25, 75);
+    const d = randInt(1, 3);
+    const a = n + d;
+    const b = n - d;
+    const answer = a * a - b * b;
+    const question = `${a}² − ${b}² = ?`;
+    const options = createOptions(answer);
+    return {
+      id,
+      question,
+      options,
+      correctAnswer: String(answer),
+      hint: `Use difference of squares identity: a² − b² = (a − b)(a + b).`,
+      mathRule: 'Algebraic Factorization Identity: a² − b² = (a − b)(a + b).',
+      partialCalculation: `(${a} − ${b}) × (${a} + ${b}) = ${a - b} × ${a + b} = ?`,
+      proInsight: `⚡ Pro Shortcut: Notice (${a} − ${b}) = ${a - b} and (${a} + ${b}) = ${a + b}. Mental product = ${a - b} × ${a + b} = ${answer}.`,
+      explanation: `${a}² − ${b}² = (${a} − ${b})(${a} + ${b}) = ${a - b} × ${a + b} = ${answer}.`,
+      category: 'equation',
+      difficulty: 'master',
+      timeLimit: 35,
+      subtitle: '👑 OLYMPIAD MASTER MATH',
+    };
+  } else if (subtype === 2) {
+    // Polynomial sequence: n^3 - n
+    const offset = randInt(2, 4);
+    const seq = [
+      offset ** 3 - offset,
+      (offset + 1) ** 3 - (offset + 1),
+      (offset + 2) ** 3 - (offset + 2),
+      (offset + 3) ** 3 - (offset + 3),
+    ];
+    const nextN = offset + 4;
+    const answer = nextN ** 3 - nextN;
+    const question = `${seq.join(', ')}, ?`;
+    const options = createOptions(answer);
+    return {
+      id,
+      question,
+      options,
+      correctAnswer: String(answer),
+      hint: `Look at n³ − n or n(n−1)(n+1): product of 3 consecutive integers!`,
+      mathRule: 'Cubic Factorial Sequence: T(n) = n³ − n = (n − 1) × n × (n + 1).',
+      partialCalculation: `n=${nextN}: ${nextN - 1} × ${nextN} × ${nextN + 1} = ${nextN - 1} × ${nextN * (nextN + 1)} = ?`,
+      proInsight: `⚡ Pro Pattern Insight: Each number is the product of 3 consecutive integers. For n=${nextN}: ${nextN - 1} × ${nextN} × ${nextN + 1} = ${answer}.`,
+      explanation: `Pattern is n³ − n (product of three consecutive integers). For n=${nextN}: ${nextN}³ − ${nextN} = ${answer}.`,
+      category: 'sequence',
+      difficulty: 'master',
+      timeLimit: 40,
+      subtitle: '👑 OLYMPIAD MASTER MATH',
+    };
+  } else if (subtype === 3) {
+    // Modular arithmetic & remainder
+    const base = randInt(3, 8);
+    const mult = randInt(12, 28);
+    const rem = randInt(1, base - 1);
+    const num = base * mult + rem;
+    const question = `Find the remainder when (${num} × 10 + 7) is divided by ${base}`;
+    const answer = (num * 10 + 7) % base;
+    const options = createOptions(answer);
+    return {
+      id,
+      question,
+      options,
+      correctAnswer: String(answer),
+      hint: `Apply modular arithmetic: (A × B + C) mod M = [(A mod M)(B mod M) + (C mod M)] mod M.`,
+      mathRule: 'Modular Congruence Law: Remainder of sum/product equals sum/product of remainders.',
+      partialCalculation: `${num} ≡ ${rem} (mod ${base})\n10 ≡ ${10 % base} (mod ${base})\n7 ≡ ${7 % base} (mod ${base})\nTotal = (${rem} × ${10 % base} + ${7 % base}) mod ${base}`,
+      proInsight: `⚡ Pro Modular Shortcut: Never multiply the full numbers! Directly compute (${rem} × ${10 % base} + ${7 % base}) mod ${base} = ${answer}.`,
+      explanation: `Using modular arithmetic mod ${base}: ${num} ≡ ${rem}, 10 ≡ ${10 % base}, 7 ≡ ${7 % base}. (${rem} × ${10 % base} + ${7 % base}) = ${rem * (10 % base) + (7 % base)}, which leaves remainder ${answer}.`,
+      category: 'arithmetic',
+      difficulty: 'master',
+      timeLimit: 35,
+      subtitle: '👑 OLYMPIAD MASTER MATH',
+    };
+  } else {
+    // Nested bracket BODMAS
+    const a = randInt(12, 24);
+    const b = randInt(2, 6);
+    const c = randInt(3, 8);
+    const d = randInt(2, 5);
+    const e = randInt(2, 4);
+    const inner1 = (a - b) * c;
+    const inner2 = d * e;
+    const answer = inner1 + inner2;
+    const question = `[(${a} − ${b}) × ${c} + ${d} × ${e}] = ?`;
+    const options = createOptions(answer);
+    return {
+      id,
+      question,
+      options,
+      correctAnswer: String(answer),
+      hint: `Evaluate innermost brackets first: (${a} − ${b}) = ${a - b}. Then multiply ${a - b} × ${c} and ${d} × ${e}.`,
+      mathRule: 'Nested Bracket Resolution: Parentheses () resolve before square brackets [].',
+      partialCalculation: `Term 1: (${a} − ${b}) × ${c} = ${a - b} × ${c} = ${inner1}\nTerm 2: ${d} × ${e} = ${inner2}\nResult = ${inner1} + ${inner2}`,
+      proInsight: `⚡ Pro Bracket Shortcut: Calculate parallel terms independently: ${inner1} and ${inner2}, then combine: ${answer}.`,
+      explanation: `Step 1: (${a} − ${b}) = ${a - b}\nStep 2: ${a - b} × ${c} = ${inner1}\nStep 3: ${d} × ${e} = ${inner2}\nStep 4: ${inner1} + ${inner2} = ${answer}.`,
+      category: 'bodmas',
+      difficulty: 'master',
+      timeLimit: 30,
+      subtitle: '👑 OLYMPIAD MASTER MATH',
+    };
   }
 }
 
@@ -494,6 +607,7 @@ export interface HintDetails {
   mathRule: string;
   partialCalculation: string;
   generalHint: string;
+  proInsight?: string;
 }
 
 export function getPuzzleHintDetails(puzzle: Puzzle): HintDetails {
@@ -526,10 +640,26 @@ export function getPuzzleHintDetails(puzzle: Puzzle): HintDetails {
     }
   }
 
+  let proInsight = puzzle.proInsight;
+  if (!proInsight) {
+    if (puzzle.category === 'bodmas') {
+      proInsight = '⚡ Pro Calculation Hack: Group terms into algebraic binomials or factor out common divisors before computing the full equation.';
+    } else if (puzzle.category === 'sequence') {
+      proInsight = '⚡ Pro Pattern Insight: Check whether terms follow polynomial differences (Δ² / Δ³), powers of 2 (2ⁿ±1), or consecutive primes.';
+    } else if (puzzle.category === 'speed') {
+      proInsight = '⚡ Pro Speed Trick: Round to nearest base-10 landmark (e.g. 50, 100), compute rapid offset delta, then cross-check unit digits.';
+    } else if (puzzle.category === 'logic') {
+      proInsight = '⚡ Pro Deduction Technique: Isolate known constants first, then immediately eliminate 2 contradictory answer choices.';
+    } else {
+      proInsight = '⚡ Pro Master Insight: Use digit sum (mod 9) or parity check to verify the correct option in under 5 seconds.';
+    }
+  }
+
   return {
     mathRule,
     partialCalculation,
     generalHint,
+    proInsight,
   };
 }
 

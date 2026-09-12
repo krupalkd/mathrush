@@ -1,4 +1,4 @@
-export type GameMode = 'quick' | 'daily' | 'streak' | 'battle' | 'brain' | 'adaptive';
+export type GameMode = 'quick' | 'daily' | 'streak' | 'battle' | 'brain' | 'adaptive' | 'master';
 
 export type DifficultyLevel = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert' | 'master';
 
@@ -12,6 +12,7 @@ export interface Puzzle {
   hint: string;
   mathRule?: string;
   partialCalculation?: string;
+  proInsight?: string;
   explanation: string;
   category: PuzzleCategory | string;
   difficulty: DifficultyLevel;
@@ -78,6 +79,7 @@ export interface LeaderboardEntry {
   country: string;
   level?: number;
   isUser?: boolean;
+  isPro?: boolean;
   status?: 'online' | 'in_game' | 'idle';
   recentGain?: number;
 }
@@ -105,6 +107,9 @@ export interface Achievement {
   current: number;
   xpReward: number;
   unlocked: boolean;
+  category?: 'milestones' | 'streaks' | 'battles' | 'skills';
+  rarity?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  unit?: string;
 }
 
 export interface PuzzleResult {

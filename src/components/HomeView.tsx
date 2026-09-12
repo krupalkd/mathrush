@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, PuzzleCategory, UserStats } from '../types';
-import { Zap, Swords, Flame, Sparkles, Brain, Cpu, Clock, Target, ArrowRight, Award, Trophy, ShieldAlert, Hourglass, Lock, Cloud, LogIn, RotateCcw } from 'lucide-react';
+import { Zap, Swords, Flame, Sparkles, Brain, Cpu, Clock, Target, ArrowRight, Award, Trophy, ShieldAlert, Hourglass, Lock, Cloud, LogIn, RotateCcw, Crown, CheckCircle } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { getDailyChallenge } from '../utils/puzzleEngine';
 import { getLevelProgress } from '../utils/storage';
@@ -373,35 +373,91 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
-        {/* 6. Pro Member / Startup monetization teaser */}
+        {/* 6. Master & Genius Olympiad (Pro Feature) */}
         <div
           onClick={() => {
             sound.playClick();
-            onOpenPro();
+            if (stats.isPro) {
+              onStartGame('master');
+            } else {
+              onOpenPro();
+            }
           }}
-          className="bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 border border-amber-800/40 hover:border-amber-500/70 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:shadow-amber-900/20 active:scale-[0.99] group relative flex flex-col justify-between"
+          className={`bg-gradient-to-br border rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all active:scale-[0.99] group relative flex flex-col justify-between ${
+            stats.isPro
+              ? 'from-amber-950/40 via-slate-900 to-yellow-950/20 border-amber-500/60 hover:border-amber-400 hover:shadow-amber-900/30'
+              : 'from-slate-900 via-slate-900 to-amber-950/20 border-amber-500/30 hover:border-amber-500/60'
+          }`}
         >
           <div>
             <div className="flex items-start justify-between mb-2.5">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
-                <Award className="w-6 h-6 text-slate-950 font-black" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950 fill-slate-950" />
               </div>
-              <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-amber-500 text-slate-950 rounded-md">
-                {stats.isPro ? 'ACTIVE PRO' : '₹99/MO'}
+              <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded-md flex items-center gap-1 ${
+                stats.isPro
+                  ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950'
+                  : 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+              }`}>
+                {stats.isPro ? '👑 2X XP ACTIVE' : 'PRO EXCLUSIVE'}
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1">MathRush Pro</h3>
+            <h3 className="text-base sm:text-lg font-black text-white font-['Outfit'] mb-1 flex items-center gap-1.5">
+              <span>Master Olympiad</span>
+              {!stats.isPro && <Lock className="w-3.5 h-3.5 text-amber-400" />}
+            </h3>
             <p className="text-xs text-slate-300 font-medium mb-3 line-clamp-2">
-              Unlock unlimited hints, detailed speed analytics, AI tutor explanations, and exclusive Master puzzles.
+              High-difficulty Olympiad math, modular arithmetic, polynomial sequences, and double 2x XP multiplier.
             </p>
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-amber-400 group-hover:text-amber-300">
-            <span>{stats.isPro ? 'Manage Membership' : 'Explore Pro Perks'}</span>
+            <span>{stats.isPro ? 'Play Olympiad' : 'Unlock with Pro'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
         </div>
+      </div>
+
+      {/* MathRush Pro Membership & VIP Perks Banner */}
+      <div className="bg-gradient-to-r from-amber-950/50 via-slate-900 to-amber-950/30 border border-amber-500/40 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+            <Crown className="w-6 h-6 text-slate-950 fill-slate-950" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-black text-white font-['Outfit']">MathRush Pro VIP Membership</h3>
+              <span className={`px-2 py-0.5 text-[10px] font-black rounded uppercase ${
+                stats.isPro
+                  ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300'
+                  : 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+              }`}>
+                {stats.isPro ? 'ACTIVE VIP' : '₹99 / MONTH'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-0.5">
+              {stats.isPro
+                ? 'All VIP perks active: Unlimited hints, infinite energy, 2x XP multiplier, and Master Arena unlocked.'
+                : 'Supercharge your daily training: Unlimited hints, infinite hearts, 2x XP, and Master Olympiad puzzles.'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            sound.playClick();
+            onOpenPro();
+          }}
+          className={`w-full md:w-auto px-5 py-2.5 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md cursor-pointer whitespace-nowrap ${
+            stats.isPro
+              ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40'
+              : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-amber-500/20'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          <span>{stats.isPro ? 'Manage Pro Membership' : 'Upgrade to MathRush Pro'}</span>
+        </button>
       </div>
 
       {/* Quick Stats Grid */}

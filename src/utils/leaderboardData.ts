@@ -15,6 +15,7 @@ export interface GlobalPlayerTemplate {
   losses: number;
   avgTime: number;
   status: 'online' | 'in_game' | 'idle';
+  isPro?: boolean;
 }
 
 export const INITIAL_GLOBAL_PLAYERS: GlobalPlayerTemplate[] = [
@@ -33,6 +34,7 @@ export const INITIAL_GLOBAL_PLAYERS: GlobalPlayerTemplate[] = [
     losses: 12,
     avgTime: 3.4,
     status: 'online',
+    isPro: true,
   },
   {
     id: 'p-2',
@@ -49,6 +51,7 @@ export const INITIAL_GLOBAL_PLAYERS: GlobalPlayerTemplate[] = [
     losses: 14,
     avgTime: 3.9,
     status: 'in_game',
+    isPro: true,
   },
   {
     id: 'p-3',
@@ -261,6 +264,7 @@ export function buildLeaderboardEntries(
     country: '🌐',
     level: userStats.level || 1,
     isUser: true,
+    isPro: userStats.isPro || false,
     status: 'online',
   };
 
@@ -291,6 +295,7 @@ export function buildLeaderboardEntries(
       timeSec: p.avgTime,
       rank: 0,
       isUser: false,
+      isPro: p.isPro || false,
       status: p.status,
     };
   });

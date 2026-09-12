@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { UserStats } from '../types';
 import { sound } from '../utils/audio';
-import { INITIAL_ACHIEVEMENTS, getLevelProgress, addXp, refillLivesFull } from '../utils/storage';
+import { getLevelProgress, refillLivesFull } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
+import { AchievementsSection } from './AchievementsSection';
 import {
   Trophy,
   Award,
@@ -33,8 +34,10 @@ import {
   RefreshCw,
   Mail,
   User as UserIcon,
+  WifiOff,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
 interface ProfileViewProps {
   stats: UserStats;
@@ -68,6 +71,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     startFreshJourney,
   } = useAuth();
 
+  const isOnline = useOnlineStatus();
   const [now, setNow] = useState<number>(Date.now());
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(stats.name);
@@ -204,20 +208,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     setShowAvatarPicker(false);
   };
 
-  const handleClaimAchievement = (achId: string, xpReward: number) => {
-    sound.playBattleWin();
-    confetti({ particleCount: 70, spread: 50 });
-    const updatedAch = [...(stats.achievements || []), achId];
-    const { updated } = addXp(
-      {
-        ...stats,
-        achievements: updatedAch,
-      },
-      xpReward
-    );
-    onUpdateStats(updated);
-  };
-
   const levelTiers = [
     { title: 'Beginner', levels: 'Lv 1–10', icon: '🥉', min: 1 },
     { title: 'Calculator', levels: 'Lv 11–25', icon: '🥈', min: 11 },
@@ -228,6 +218,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 text-slate-100 space-y-6 pb-24 md:pb-12">
+      {/* Offline Profile Cache Banner */}
+      {!isOnline && (
+        <div
+          id="profile-offline-cache-card"
+          className="p-3.5 bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border border-amber-500/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-md"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center shrink-0">
+              <WifiOff className="w-4 h-4 text-amber-400" />
+            </div>
+            <div>
+              <span className="font-bold text-amber-300 block">Offline Cache Active</span>
+              <span className="text-[11px] text-slate-300">
+                You are viewing your locally cached player profile, stats, XP, and unlocked achievements. All offline game progress is stored safely on your device.
+              </span>
+            </div>
+          </div>
+          <span className="shrink-0 px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[10px] font-mono font-bold w-fit">
+            Device Cache
+          </span>
+        </div>
+      )}
+
       {/* Profile Card Header */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
@@ -975,55 +988,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       </div>
 
-      {/* Achievements List */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
-          Badges & Achievements
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INITIAL_ACHIEVEMENTS.map((ach) => {
-            const isClaimed = stats.achievements?.includes(ach.id);
-            const isEligible = stats.puzzlesSolved >= 1 || (ach.id === 'ach_speed_demon' && stats.avgTimeSeconds < 15);
-
-            return (
-              <div
-                key={ach.id}
-                className={`p-4 rounded-xl border flex items-center justify-between gap-3 ${
-                  isClaimed
-                    ? 'bg-indigo-950/30 border-indigo-500/30'
-                    : isEligible
-                    ? 'bg-slate-900 border-amber-500/50'
-                    : 'bg-slate-900/60 border-slate-800 opacity-60'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{ach.icon}</span>
-                  <div>
-                    <span className="text-sm font-bold text-white block">{ach.title}</span>
-                    <span className="text-[11px] text-slate-400 block">{ach.description}</span>
-                  </div>
-                </div>
-
-                {isClaimed ? (
-                  <span className="px-2.5 py-1 bg-emerald-950/80 border border-emerald-600/40 text-emerald-400 text-[10px] font-bold rounded-lg uppercase">
-                    Unlocked
-                  </span>
-                ) : isEligible ? (
-                  <button
-                    onClick={() => handleClaimAchievement(ach.id, ach.xpReward)}
-                    className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-xs font-black rounded-lg shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  >
-                    Claim +{ach.xpReward} XP
-                  </button>
-                ) : (
-                  <span className="text-xs text-slate-500 font-mono">In Progress</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Achievements & Badges Section */}
+      <AchievementsSection stats={stats} onUpdateStats={onUpdateStats} />
     </div>
   );
 };

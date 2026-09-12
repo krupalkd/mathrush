@@ -454,6 +454,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
                             YOU
                           </span>
                         )}
+                        {player.isPro && (
+                          <span className="px-1.5 py-0.2 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-black rounded flex items-center gap-0.5 shadow-sm">
+                            <Crown className="w-2.5 h-2.5 fill-slate-950" />
+                            <span>PRO</span>
+                          </span>
+                        )}
                         <span className="text-xs">{player.country}</span>
                       </div>
                       <span className="text-[11px] text-slate-400 block truncate">

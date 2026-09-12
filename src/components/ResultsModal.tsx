@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, PuzzleResult, UserStats } from '../types';
 import { sound } from '../utils/audio';
-import { Trophy, Clock, Target, Zap, Share2, RotateCcw, Home, Sparkles, CheckCircle2, XCircle, Download, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trophy, Clock, Target, Zap, Share2, RotateCcw, Home, Sparkles, CheckCircle2, XCircle, Download, ExternalLink, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { downloadShareCard, shareScoreToSocial } from '../utils/shareImage';
 
 interface ResultsModalProps {
@@ -16,6 +16,7 @@ interface ResultsModalProps {
   stats: UserStats;
   onPlayAgain: () => void;
   onGoHome: () => void;
+  onOpenLevelUpOverlay?: () => void;
 }
 
 export const ResultsModal: React.FC<ResultsModalProps> = ({
@@ -30,6 +31,7 @@ export const ResultsModal: React.FC<ResultsModalProps> = ({
   stats,
   onPlayAgain,
   onGoHome,
+  onOpenLevelUpOverlay,
 }) => {
   const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
   const [aiExplanations, setAiExplanations] = useState<Record<string, string>>({});
@@ -135,10 +137,14 @@ export const ResultsModal: React.FC<ResultsModalProps> = ({
 
         {/* Level Up Banner */}
         {leveledUp && (
-          <div className="my-2 inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 rounded-xl font-extrabold text-xs shadow-md animate-bounce">
+          <button
+            onClick={onOpenLevelUpOverlay}
+            className="my-2 inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 rounded-xl font-extrabold text-xs shadow-md shadow-amber-500/20 animate-bounce cursor-pointer transition-transform active:scale-95"
+            title="Click to view celebration animation"
+          >
             <Sparkles className="w-4 h-4 fill-slate-950" />
             <span>LEVEL UP! You reached Level {newLevel || stats.level} ({stats.title})!</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -158,7 +164,13 @@ export const ResultsModal: React.FC<ResultsModalProps> = ({
           <span className="text-lg font-extrabold text-white">{avgSpeed}s</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-center">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-center relative overflow-hidden">
+          {(stats.isPro || mode === 'master') && (
+            <div className="absolute top-0 right-0 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-[9px] rounded-bl-lg shadow-sm flex items-center gap-0.5">
+              <Crown className="w-2.5 h-2.5 fill-slate-950" />
+              <span>2X PRO</span>
+            </div>
+          )}
           <Zap className="w-5 h-5 text-amber-400 mx-auto mb-1" />
           <span className="text-[10px] text-slate-400 uppercase font-bold block">XP Gained</span>
           <span className="text-lg font-extrabold text-amber-400">+{xpEarned}</span>

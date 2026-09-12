@@ -41,7 +41,7 @@ export const ProModal: React.FC<ProModalProps> = ({
 
   const proFeatures = [
     { title: 'Unlimited Hints', desc: 'Step-by-step guidance' },
-    { title: 'Zero Advertisements', desc: '100% pure focus mode' },
+    { title: '2X XP Multiplier', desc: 'Double XP across games' },
     { title: 'Master & Genius Levels', desc: 'Olympiad-tier math' },
     { title: 'Deep AI Explanations', desc: 'Speed breakdown on errors' },
     { title: 'Infinite Hearts & Energy', desc: 'No refill wait times' },

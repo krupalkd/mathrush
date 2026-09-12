@@ -14,6 +14,8 @@ import { ProModal } from './components/ProModal';
 import { AuthModal } from './components/AuthModal';
 import { SignInGate } from './components/SignInGate';
 import { StartupMetricsDrawer } from './components/StartupMetricsDrawer';
+import { LevelUpOverlay } from './components/LevelUpOverlay';
+import { getTitleForLevel } from './utils/storage';
 
 function AppContent() {
   const { user, stats, updateStats, loading, openAuthForGameplay } = useAuth();
@@ -21,6 +23,12 @@ function AppContent() {
   const [activeGameMode, setActiveGameMode] = useState<GameMode>('quick');
   const [selectedCategory, setSelectedCategory] = useState<PuzzleCategory | undefined>(undefined);
   const [showProModal, setShowProModal] = useState<boolean>(false);
+  const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<boolean>(false);
+  const [levelUpData, setLevelUpData] = useState<{
+    newLevel: number;
+    oldLevel: number;
+    title?: string;
+  } | null>(null);
 
   // Game session results state
   const [gameResults, setGameResults] = useState<{
@@ -38,6 +46,20 @@ function AppContent() {
     sound.enabled = stats.soundEnabled !== false;
     sound.hapticsEnabled = stats.hapticsEnabled !== false;
   }, [stats.soundEnabled, stats.hapticsEnabled]);
+
+  // Track level increase across the application to trigger celebration overlay
+  const prevLevelRef = React.useRef(stats.level);
+  useEffect(() => {
+    if (prevLevelRef.current && stats.level > prevLevelRef.current) {
+      setLevelUpData({
+        newLevel: stats.level,
+        oldLevel: prevLevelRef.current,
+        title: stats.title || getTitleForLevel(stats.level),
+      });
+      setShowLevelUpOverlay(true);
+    }
+    prevLevelRef.current = stats.level;
+  }, [stats.level, stats.title]);
 
   const handleStartGame = (mode: GameMode, category?: PuzzleCategory) => {
     if (!user) {
@@ -90,6 +112,17 @@ function AppContent() {
   }) => {
     setGameResults(results);
     setCurrentTab('results');
+
+    // Trigger overlay animation with confetti & glow when results indicate a level increase
+    if (results.leveledUp) {
+      const reachedLevel = results.newLevel || stats.level;
+      setLevelUpData({
+        newLevel: reachedLevel,
+        oldLevel: Math.max(1, reachedLevel - 1),
+        title: getTitleForLevel(reachedLevel),
+      });
+      setShowLevelUpOverlay(true);
+    }
   };
 
   if (loading) {
@@ -234,9 +267,29 @@ function AppContent() {
             onGoHome={() => {
               setCurrentTab('home');
             }}
+            onOpenLevelUpOverlay={() => {
+              const reachedLevel = gameResults.newLevel || stats.level;
+              setLevelUpData({
+                newLevel: reachedLevel,
+                oldLevel: Math.max(1, reachedLevel - 1),
+                title: getTitleForLevel(reachedLevel),
+              });
+              setShowLevelUpOverlay(true);
+            }}
           />
         )}
       </main>
+
+      {/* Level Up Confetti & Glow Celebration Overlay */}
+      {showLevelUpOverlay && levelUpData && (
+        <LevelUpOverlay
+          isOpen={showLevelUpOverlay}
+          level={levelUpData.newLevel}
+          previousLevel={levelUpData.oldLevel}
+          title={levelUpData.title}
+          onClose={() => setShowLevelUpOverlay(false)}
+        />
+      )}
 
       {/* Global Auth Modal for Google, Facebook, Email & Fresh Start */}
       <AuthModal />

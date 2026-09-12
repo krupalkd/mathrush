@@ -17,10 +17,13 @@ import {
   LogIn,
   RotateCcw,
   Gamepad2,
+  WifiOff,
 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { refillLivesFull } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   stats: UserStats;
@@ -42,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   selectedCategory,
 }) => {
   const { user, profile, isCloudSynced, isSaving, setAuthModalOpen, setAuthModalMode } = useAuth();
+  const isOnline = useOnlineStatus();
   const [showHeartTooltip, setShowHeartTooltip] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [refillCountdown, setRefillCountdown] = useState('');
@@ -52,6 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'home':
         return { name: 'Mainboard', icon: '🎮', highlight: true };
       case 'game':
+        if (activeGameMode === 'master') return { name: 'Pro Master Arena', icon: '👑' };
         if (activeGameMode === 'quick') return { name: 'Quick Rush', icon: '⚡' };
         if (activeGameMode === 'streak') return { name: 'Survival Streak', icon: '🔥' };
         if (activeGameMode === 'brain') return { name: 'Memory Matrix', icon: '🧠' };
@@ -219,12 +224,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="btn-hearts-indicator"
                 onClick={() => setShowHeartTooltip(!showHeartTooltip)}
-                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-rose-950/60 border border-rose-800/50 rounded-lg hover:border-rose-500/70 transition-colors cursor-pointer"
-                title="Lives remaining"
+                className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                  stats.isPro
+                    ? 'bg-rose-950/40 border-rose-500/50 hover:border-rose-400'
+                    : 'bg-rose-950/60 border-rose-800/50 hover:border-rose-500/70'
+                }`}
+                title={stats.isPro ? 'Pro Member: Infinite Energy' : 'Lives remaining'}
               >
                 <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500 fill-rose-500 shrink-0" />
                 <span className="font-black text-[11px] sm:text-xs text-rose-200">
-                  {stats.lives}/{stats.maxLives}
+                  {stats.isPro ? '∞' : `${stats.lives}/${stats.maxLives}`}
                 </span>
               </button>
 
@@ -234,14 +243,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span className="font-bold text-white flex items-center gap-1.5">
                       <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> Lives Energy
                     </span>
-                    <span className="text-rose-400 font-extrabold">{stats.lives}/{stats.maxLives}</span>
+                    <span className="text-rose-400 font-extrabold">{stats.isPro ? '∞ Infinite' : `${stats.lives}/${stats.maxLives}`}</span>
                   </div>
                   <p className="text-slate-300 text-[11px] mb-2.5 leading-relaxed">
-                    {stats.lives < stats.maxLives
+                    {stats.isPro
+                      ? 'MathRush Pro VIP: You have unlimited energy and never lose hearts!'
+                      : stats.lives < stats.maxLives
                       ? `Next heart refilling in ${refillCountdown}`
                       : 'Your lives energy is 100% full!'}
                   </p>
-                  {stats.lives < stats.maxLives && (
+                  {!stats.isPro && stats.lives < stats.maxLives && (
                     <button
                       onClick={handleRefillLives}
                       className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-lg text-xs transition-colors cursor-pointer shadow-md"
@@ -281,8 +292,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Upgrade to Pro Button */}
-          {!stats.isPro ? (
+          {/* Upgrade or Manage Pro Button */}
+          {stats.isPro ? (
+            <button
+              id="btn-active-pro-nav"
+              onClick={() => {
+                sound.playClick();
+                onOpenPro();
+              }}
+              className="flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-[10px] sm:text-xs rounded-lg shadow-md shadow-amber-500/20 hover:scale-105 transition-all transform active:scale-95 cursor-pointer shrink-0"
+              title="MathRush Pro Active — Click to manage membership"
+            >
+              <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-slate-950 shrink-0" />
+              <span>PRO 👑</span>
+            </button>
+          ) : (
             <button
               id="btn-go-pro-nav"
               onClick={() => {
@@ -295,7 +319,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-slate-950 shrink-0" />
               <span>PRO</span>
             </button>
-          ) : null}
+          )}
+
+          {/* Offline Mode Indicator Badge */}
+          {!isOnline && (
+            <div
+              id="nav-offline-pill"
+              className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 border border-amber-500/50 text-amber-300 rounded-lg text-[10px] sm:text-xs font-bold shrink-0 animate-pulse"
+              title="Offline Mode: Using cached profile, stats, and game modes"
+            >
+              <WifiOff className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" />
+              <span className="hidden xs:inline">Offline</span>
+            </div>
+          )}
+
+          {/* In-App PWA Install Prompt Button */}
+          <PWAInstallButton compact />
 
           {/* Sound / Volume Toggle Button (Hidden on main screen) */}
           {currentTab !== 'home' && (

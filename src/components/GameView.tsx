@@ -3,7 +3,7 @@ import { DifficultyLevel, GameMode, Puzzle, PuzzleCategory, PuzzleResult, UserSt
 import { sound } from '../utils/audio';
 import { CURATED_PUZZLES, generateProceduralPuzzle, fetchAIPuzzle, getDailyChallenge, getPuzzleHintDetails } from '../utils/puzzleEngine';
 import { addXp, deductLife } from '../utils/storage';
-import { Clock, Lightbulb, Zap, Heart, Flame, HelpCircle, X, ChevronRight, Calculator, BookOpen, AlertCircle, Sparkles } from 'lucide-react';
+import { Clock, Lightbulb, Zap, Heart, Flame, HelpCircle, X, ChevronRight, Calculator, BookOpen, AlertCircle, Sparkles, Crown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface GameViewProps {
@@ -58,15 +58,12 @@ export const GameView: React.FC<GameViewProps> = ({
     if (!currentPuzzle) return;
     const isAlreadyUnlocked = unlockedHintIds.includes(currentPuzzle.id);
 
-    if (isAlreadyUnlocked) {
+    // Pro members have unlimited hints!
+    if (stats.isPro || isAlreadyUnlocked || hintsLeft > 0) {
       sound.playClick();
-      setShowHintModal(true);
-      return;
-    }
-
-    if (hintsLeft > 0) {
-      sound.playClick();
-      setHintsLeft((prev) => Math.max(0, prev - 1));
+      if (!stats.isPro && !isAlreadyUnlocked) {
+        setHintsLeft((prev) => Math.max(0, prev - 1));
+      }
       setUnlockedHintIds((prev) => [...prev, currentPuzzle.id]);
       setShowHintModal(true);
     } else {
@@ -82,6 +79,13 @@ export const GameView: React.FC<GameViewProps> = ({
     if (mode === 'daily') {
       const { puzzle } = getDailyChallenge();
       initialList = [puzzle];
+    } else if (mode === 'master') {
+      // Pro Master Olympiad mode with high-tier questions and 2x XP
+      const pool = CURATED_PUZZLES.filter((p) => p.difficulty === 'master' || p.difficulty === 'hard');
+      while (pool.length < 8) {
+        pool.push(generateProceduralPuzzle('master'));
+      }
+      initialList = pool.slice(0, 8).map((p) => ({ ...p, timeLimit: 35, subtitle: '👑 OLYMPIAD MASTER MATH' }));
     } else if (mode === 'quick') {
       // 10 high-speed questions
       const pool = CURATED_PUZZLES.slice().sort(() => Math.random() - 0.5);
@@ -176,7 +180,10 @@ export const GameView: React.FC<GameViewProps> = ({
         setAnsweredState('correct');
         const speedBonus = timeSpent <= 5 ? 30 : timeSpent <= 10 ? 15 : 0;
         const comboBonus = Math.min(50, streakCombo * 10);
-        earnedXp = 50 + speedBonus + comboBonus;
+        const baseCalculatedXp = 50 + speedBonus + comboBonus;
+        // Pro members and Master Olympiad players earn 2x XP!
+        const multiplier = stats.isPro || mode === 'master' ? 2 : 1;
+        earnedXp = baseCalculatedXp * multiplier;
         setStreakCombo((prev) => prev + 1);
         setTotalXpEarned((prev) => prev + earnedXp);
 
@@ -293,8 +300,20 @@ export const GameView: React.FC<GameViewProps> = ({
         <div className="flex items-center justify-between">
           {/* Mode & Question Counter */}
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-extrabold uppercase bg-slate-800 border border-slate-700 text-indigo-300 rounded-lg">
-              {mode === 'quick' ? '⚡ Quick Math' : mode === 'daily' ? '🧩 Daily Challenge' : mode === 'streak' ? '🔥 Streak Mode' : '🧠 Brain Puzzle'}
+            <span className={`px-2.5 py-1 text-xs font-extrabold uppercase rounded-lg border ${
+              mode === 'master'
+                ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/50 text-amber-300'
+                : 'bg-slate-800 border-slate-700 text-indigo-300'
+            }`}>
+              {mode === 'quick'
+                ? '⚡ Quick Math'
+                : mode === 'daily'
+                ? '🧩 Daily Challenge'
+                : mode === 'streak'
+                ? '🔥 Streak Mode'
+                : mode === 'master'
+                ? '👑 Pro Master Arena (2X XP)'
+                : '🧠 Brain Puzzle'}
             </span>
             <span className="text-xs text-slate-400 font-semibold">
               {mode === 'streak' ? `Score: ${resultsList.filter((r) => r.isCorrect).length}` : `Q ${currentIndex + 1} of ${puzzles.length}`}
@@ -312,16 +331,36 @@ export const GameView: React.FC<GameViewProps> = ({
 
             {/* Session Hints counter */}
             <div
-              className="flex items-center gap-1 text-amber-300 font-bold text-xs bg-amber-950/40 border border-amber-800/40 px-2 py-1 rounded-lg"
-              title={`${hintsLeft} of 3 hints remaining in this session`}
+              className={`flex items-center gap-1 font-bold text-xs px-2 py-1 rounded-lg border ${
+                stats.isPro
+                  ? 'text-amber-300 bg-amber-950/40 border-amber-500/40'
+                  : 'text-amber-300 bg-amber-950/40 border-amber-800/40'
+              }`}
+              title={stats.isPro ? 'Pro Member: Unlimited Hints unlocked!' : `${hintsLeft} of 3 hints remaining in this session`}
             >
-              <Lightbulb className={`w-3.5 h-3.5 ${hintsLeft > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}`} />
-              <span>{hintsLeft}/3</span>
+              {stats.isPro ? (
+                <>
+                  <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>∞ Hints</span>
+                </>
+              ) : (
+                <>
+                  <Lightbulb className={`w-3.5 h-3.5 ${hintsLeft > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}`} />
+                  <span>{hintsLeft}/3</span>
+                </>
+              )}
             </div>
 
-            <div className="flex items-center gap-1 text-rose-400 font-bold text-xs bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded-lg">
+            <div
+              className={`flex items-center gap-1 font-bold text-xs px-2 py-1 rounded-lg border ${
+                stats.isPro
+                  ? 'text-rose-300 bg-rose-950/30 border-rose-500/40'
+                  : 'text-rose-400 bg-rose-950/40 border-rose-800/40'
+              }`}
+              title={stats.isPro ? 'Pro Member: Infinite Hearts • Never runs out!' : `${stats.lives} of ${stats.maxLives} hearts remaining`}
+            >
               <Heart className="w-3.5 h-3.5 fill-rose-500" />
-              <span>{stats.lives}</span>
+              <span>{stats.isPro ? '∞' : stats.lives}</span>
             </div>
 
             <button
@@ -469,31 +508,69 @@ export const GameView: React.FC<GameViewProps> = ({
                 </button>
               </div>
 
-              {/* 3 Hints per session indicator */}
+              {/* Hints per session indicator */}
               <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-800/80 border border-slate-700/60 rounded-2xl text-xs">
-                <span className="text-slate-300 font-medium">Session Hints Remaining:</span>
-                <div className="flex items-center gap-1.5">
-                  {[1, 2, 3].map((slot) => {
-                    const isUsed = slot > hintsLeft;
-                    return (
-                      <span
-                        key={slot}
-                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold ${
-                          !isUsed
-                            ? 'bg-amber-400/20 border border-amber-400/60 text-amber-300 shadow-sm shadow-amber-500/20'
-                            : 'bg-slate-800 border border-slate-700 text-slate-600'
-                        }`}
-                        title={!isUsed ? `Hint slot ${slot} available` : `Hint slot ${slot} used`}
-                      >
-                        <Lightbulb className={`w-3 h-3 ${!isUsed ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`} />
-                      </span>
-                    );
-                  })}
-                  <span className="ml-1.5 font-extrabold text-amber-300 text-xs">
-                    {hintsLeft} / 3
-                  </span>
-                </div>
+                <span className="text-slate-300 font-medium">Session Hints:</span>
+                {stats.isPro ? (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/40 rounded-xl text-amber-300 font-extrabold text-xs">
+                    <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>PRO UNLIMITED HINTS ACTIVE</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    {[1, 2, 3].map((slot) => {
+                      const isUsed = slot > hintsLeft;
+                      return (
+                        <span
+                          key={slot}
+                          className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold ${
+                            !isUsed
+                              ? 'bg-amber-400/20 border border-amber-400/60 text-amber-300 shadow-sm shadow-amber-500/20'
+                              : 'bg-slate-800 border border-slate-700 text-slate-600'
+                          }`}
+                          title={!isUsed ? `Hint slot ${slot} available` : `Hint slot ${slot} used`}
+                        >
+                          <Lightbulb className={`w-3 h-3 ${!isUsed ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`} />
+                        </span>
+                      );
+                    })}
+                    <span className="ml-1.5 font-extrabold text-amber-300 text-xs">
+                      {hintsLeft} / 3
+                    </span>
+                  </div>
+                )}
               </div>
+
+              {/* Pro Feature: Deep AI Step-by-Step Breakdown & Shortcut */}
+              {stats.isPro && hintDetails.proInsight ? (
+                <div className="p-3.5 bg-gradient-to-r from-amber-950/40 via-yellow-950/30 to-amber-950/40 border border-amber-500/50 rounded-2xl space-y-1.5 shadow-md shadow-amber-500/10">
+                  <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                    <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>PRO Deep AI Step-by-Step Breakdown</span>
+                  </div>
+                  <p className="text-xs text-amber-100 font-medium leading-relaxed">
+                    {hintDetails.proInsight}
+                  </p>
+                </div>
+              ) : (
+                <div className="p-3 bg-gradient-to-r from-amber-950/20 via-slate-900 to-amber-950/20 border border-amber-500/30 rounded-2xl flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div className="text-[11px] text-slate-300">
+                      <span className="font-bold text-amber-300">MathRush Pro:</span> Unlock unlimited hints & AI shortcuts.
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowHintModal(false);
+                      onOpenPro();
+                    }}
+                    className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-extrabold text-[11px] rounded-xl cursor-pointer whitespace-nowrap shadow-sm shadow-amber-500/20"
+                  >
+                    Upgrade
+                  </button>
+                </div>
+              )}
 
               {/* Section 1: Mathematical Rule */}
               <div className="p-3.5 bg-indigo-950/30 border border-indigo-800/40 rounded-2xl space-y-1.5">
@@ -528,7 +605,7 @@ export const GameView: React.FC<GameViewProps> = ({
               {/* Footer */}
               <div className="flex items-center justify-between pt-2 border-t border-slate-800">
                 <span className="text-[11px] text-slate-500 font-medium">
-                  Max 3 hints per game session
+                  {stats.isPro ? 'Unlimited hints active with Pro' : 'Max 3 hints per game session'}
                 </span>
                 <button
                   id="btn-confirm-hint"
@@ -557,7 +634,7 @@ export const GameView: React.FC<GameViewProps> = ({
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-white">No Hints Remaining</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                You have utilized all <strong className="text-amber-300">3 hints</strong> allowed for this game session. Test your speed and mental math for the remaining questions!
+                You have utilized all <strong className="text-amber-300">3 hints</strong> allowed for this game session. Upgrade to MathRush Pro for unlimited hints and instant AI explanations!
               </p>
             </div>
 
@@ -566,16 +643,31 @@ export const GameView: React.FC<GameViewProps> = ({
               <span>Hints reset automatically when you start a new game session.</span>
             </div>
 
-            <button
-              id="btn-close-no-hints"
-              onClick={() => {
-                sound.playClick();
-                setShowNoHintsModal(false);
-              }}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs border border-slate-600 transition-colors cursor-pointer"
-            >
-              Understood, Continue Game
-            </button>
+            <div className="space-y-2 pt-1">
+              <button
+                id="btn-unlock-pro-hints"
+                onClick={() => {
+                  sound.playClick();
+                  setShowNoHintsModal(false);
+                  onOpenPro();
+                }}
+                className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-extrabold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer transition-transform active:scale-95"
+              >
+                <Crown className="w-4 h-4 fill-slate-950" />
+                <span>Unlock Unlimited Hints with MathRush Pro</span>
+              </button>
+
+              <button
+                id="btn-close-no-hints"
+                onClick={() => {
+                  sound.playClick();
+                  setShowNoHintsModal(false);
+                }}
+                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl text-xs border border-slate-700 transition-colors cursor-pointer"
+              >
+                Continue Free
+              </button>
+            </div>
           </div>
         </div>
       )}
