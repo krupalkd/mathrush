@@ -49,7 +49,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     description: 'Accumulate 1,000 Total XP in MathRush',
     icon: '💎',
     target: 1000,
-    current: 120,
+    current: 0,
     xpReward: 250,
     unlocked: false,
   },
@@ -67,24 +67,24 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
 
 export function getInitialUserStats(): UserStats {
   return {
-    xp: 120,
-    level: 2,
+    xp: 0,
+    level: 1,
     title: 'Beginner',
-    streak: 1,
-    maxStreak: 3,
+    streak: 0,
+    maxStreak: 0,
     lives: 3,
     maxLives: 3,
     lastLifeRefillTimestamp: Date.now(),
     lastPlayedDate: new Date().toISOString().split('T')[0],
     dailyCompletedDates: [],
-    puzzlesSolved: 4,
-    accuracyRate: 90,
-    avgTimeSeconds: 12.4,
-    battleElo: 1200,
-    battleWins: 2,
+    puzzlesSolved: 0,
+    accuracyRate: 100,
+    avgTimeSeconds: 0,
+    battleElo: 1000,
+    battleWins: 0,
     battleLosses: 0,
-    bestQuickScore: 8,
-    bestStreakScore: 5,
+    bestQuickScore: 0,
+    bestStreakScore: 0,
     achievements: [],
     isPro: false,
     name: 'MathNinja_' + Math.floor(Math.random() * 900 + 100),
@@ -101,6 +101,15 @@ export function loadUserStats(): UserStats {
     const raw = localStorage.getItem(STATS_KEY);
     if (!raw) return getInitialUserStats();
     const parsed = JSON.parse(raw);
+    // Ensure initial rank progression shows Level 1 instead of default mock Level 2
+    if (parsed.level === 2 && (parsed.xp === 120 || parsed.xp === undefined || parsed.puzzlesSolved <= 4)) {
+      parsed.level = 1;
+      parsed.xp = 0;
+      parsed.puzzlesSolved = 0;
+      parsed.battleWins = 0;
+      parsed.battleLosses = 0;
+      parsed.title = 'Beginner';
+    }
     const withLives = checkLivesRegeneration(parsed);
     return syncStatsWithXp(withLives);
   } catch {
