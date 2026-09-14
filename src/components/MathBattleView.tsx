@@ -146,7 +146,7 @@ export const MathBattleView: React.FC<MathBattleViewProps> = ({
       sound.playBattleWin();
       confetti({ particleCount: 100, spread: 70 });
       setBattleResult('win');
-      const earnedXp = 1000;
+      const earnedXp = 100000;
       setXpEarned(earnedXp);
       const xpRes = addXp(stats, earnedXp);
       if (xpRes.leveledUp) {
@@ -160,9 +160,9 @@ export const MathBattleView: React.FC<MathBattleViewProps> = ({
     } else {
       sound.playWrong();
       setBattleResult('loss');
-      const participationXp = 100;
-      setXpEarned(participationXp);
-      const xpRes = addXp(stats, participationXp);
+      const penaltyXp = -1000;
+      setXpEarned(penaltyXp);
+      const xpRes = addXp(stats, penaltyXp);
       if (xpRes.leveledUp) {
         setHasLeveledUp(true);
       }
@@ -282,7 +282,7 @@ export const MathBattleView: React.FC<MathBattleViewProps> = ({
           </div>
 
           <p className="text-xs font-semibold text-rose-300">
-            ⚡ Both players receive the SAME puzzle. First correct answer wins!
+            ⚡ Both players receive the SAME puzzle. Winner: +100,000 XP • Defeat: -1,000 XP
           </p>
         </div>
       )}
@@ -413,11 +413,11 @@ export const MathBattleView: React.FC<MathBattleViewProps> = ({
                 <span>XP Result:</span>
               </span>
               <div className="flex items-center gap-2">
-                <span className={`text-sm font-black ${battleResult === 'win' ? 'text-amber-400' : 'text-emerald-400'}`}>
-                  +{xpEarned} XP
+                <span className={`text-sm font-black ${xpEarned > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {xpEarned > 0 ? `+${xpEarned.toLocaleString()}` : `${xpEarned.toLocaleString()}`} XP
                 </span>
                 <span className="text-slate-400 text-xs font-semibold">
-                  (Total: {stats.xp} XP)
+                  (Total: {stats.xp.toLocaleString()} XP)
                 </span>
                 {hasLeveledUp && (
                   <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] rounded-full font-black animate-pulse">

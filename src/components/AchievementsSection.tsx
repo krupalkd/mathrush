@@ -434,7 +434,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {/* Badge Footer: Reward + Action */}
               <div className="flex items-center justify-between gap-2 pt-0.5">
                 <span className="text-xs font-black font-mono text-amber-400 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> +{ach.xpReward} XP Reward
+                  <Sparkles className="w-3 h-3" /> +{ach.xpReward.toLocaleString()} XP Reward
                 </span>
 
                 {ach.isClaimed ? (
@@ -563,7 +563,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                   }}
                   className="flex-1 py-2.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-lg transition-transform active:scale-95 cursor-pointer"
                 >
-                  Claim +{selectedBadge.xpReward} XP
+                  Claim +{selectedBadge.xpReward.toLocaleString()} XP
                 </button>
               ) : (
                 <button

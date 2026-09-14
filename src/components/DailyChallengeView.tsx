@@ -30,8 +30,8 @@ interface DailyChallengeViewProps {
   onOpenBattle: () => void;
 }
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
-const DAILY_WIN_XP = 10000;
+const ROTATION_INTERVAL_MS = 60 * 1000; // 1-minute rotation cycle
+const DAILY_WIN_XP = 100000; // +100,000 XP
 const DAILY_LOSS_PENALTY_XP = 1000;
 
 export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
@@ -60,8 +60,9 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
   }, []);
 
   const lastTimestamp = stats.lastDailyCompletedTimestamp || 0;
-  const isCooldownActive = lastTimestamp > 0 && now - lastTimestamp < ONE_HOUR_MS;
-  const remainingCooldownMs = isCooldownActive ? ONE_HOUR_MS - (now - lastTimestamp) : 0;
+  const isCooldownActive = lastTimestamp > 0 && now - lastTimestamp < ROTATION_INTERVAL_MS;
+  const remainingCooldownMs = isCooldownActive ? ROTATION_INTERVAL_MS - (now - lastTimestamp) : 0;
+  const secondsToNextRotation = 60 - (Math.floor(now / 1000) % 60);
 
   // Format cooldown display
   const formatCooldown = (ms: number): string => {
@@ -167,7 +168,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
   const handleShareResult = () => {
     sound.playClick();
     const resultText = stats.lastDailyResult?.isCorrect
-      ? `🔥 Solved MathRush Daily Challenge #${puzzleNumber} in ${60 - timeLeft}s! Claimed +10,000 XP. Can you beat me?`
+      ? `🔥 Solved MathRush Daily Challenge #${puzzleNumber} in ${60 - timeLeft}s! Claimed +100,000 XP. Can you beat me?`
       : `⚡ Attempted MathRush Daily Challenge #${puzzleNumber}! Join the live duels.`;
 
     if (navigator.clipboard) {
@@ -248,7 +249,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
               <Trophy className="w-4 h-4 text-emerald-400" />
-              Victory Reward: +10,000 XP
+              Victory Reward: +100,000 XP
             </span>
             <span className="text-slate-600">•</span>
             <span className="flex items-center gap-1.5 text-rose-400 font-semibold">
@@ -259,7 +260,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
 
           <div className="flex items-center gap-2 text-slate-300 font-mono text-xs">
             <Hourglass className="w-3.5 h-3.5 text-amber-400" />
-            <span>Cycle: Fresh hourly challenge rotation</span>
+            <span>Cycle: 1-Min Rotation (Next in {secondsToNextRotation}s)</span>
           </div>
         </div>
       </div>
@@ -277,7 +278,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
               Ready to test your speed?
             </h2>
             <p className="text-sm text-slate-300">
-              You will have <strong>60 seconds</strong> to calculate the correct answer. Accurate solvers immediately receive <strong>+10,000 XP</strong> and advance their daily streak.
+              You will have <strong>60 seconds</strong> to calculate the correct answer. Accurate solvers immediately receive <strong>+100,000 XP</strong> and advance their daily streak.
             </p>
           </div>
 
@@ -289,7 +290,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
                 <span>Challenge Cooldown Active</span>
               </div>
               <p className="text-xs text-slate-400">
-                You already completed this cycle's daily puzzle! You can play again as soon as the cooldown expires.
+                You already completed this cycle's daily puzzle! You can play again as soon as the 1-minute cooldown expires.
               </p>
               <div className="text-2xl font-black font-mono text-amber-300 bg-slate-900 border border-slate-800 rounded-lg py-2">
                 {formatCooldown(remainingCooldownMs)}
@@ -303,7 +304,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
                   className="flex-1 py-2.5 px-4 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white rounded-lg text-xs font-black flex items-center justify-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer"
                 >
                   <Swords className="w-3.5 h-3.5" />
-                  <span>Play 1v1 Battle (+1,000 XP)</span>
+                  <span>Play 1v1 Battle (+100,000 XP)</span>
                 </button>
                 <button
                   onClick={() => {
@@ -323,7 +324,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
                 onClick={handleStartChallenge}
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-base font-black rounded-xl shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2.5 mx-auto transition-transform hover:scale-105 active:scale-95 cursor-pointer uppercase tracking-wider"
               >
-                <span>Start Daily Challenge</span>
+                <span>Start Daily Challenge (+100,000 XP)</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>
@@ -506,7 +507,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
               className="flex-1 py-3 px-4 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer"
             >
               <Swords className="w-4 h-4" />
-              <span>Jump Into 1v1 Battle (+1,000 XP)</span>
+              <span>Jump Into 1v1 Battle (+100,000 XP)</span>
             </button>
 
             <button
@@ -540,7 +541,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
             <div className="text-xl">👑</div>
             <div className="overflow-hidden">
               <span className="text-xs font-bold text-white block truncate">Aarav_SpeedMath</span>
-              <span className="text-[10px] text-slate-400 font-mono">3.4s solve • +10,000 XP</span>
+              <span className="text-[10px] text-slate-400 font-mono">3.4s solve • +100,000 XP</span>
             </div>
           </div>
 
@@ -549,7 +550,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
             <div className="text-xl">🦊</div>
             <div className="overflow-hidden">
               <span className="text-xs font-bold text-white block truncate">Elena_Vortex</span>
-              <span className="text-[10px] text-slate-400 font-mono">4.1s solve • +10,000 XP</span>
+              <span className="text-[10px] text-slate-400 font-mono">4.1s solve • +100,000 XP</span>
             </div>
           </div>
 
@@ -558,7 +559,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
             <div className="text-xl">⚡</div>
             <div className="overflow-hidden">
               <span className="text-xs font-bold text-white block truncate">QuantumKai</span>
-              <span className="text-[10px] text-slate-400 font-mono">4.8s solve • +10,000 XP</span>
+              <span className="text-[10px] text-slate-400 font-mono">4.8s solve • +100,000 XP</span>
             </div>
           </div>
         </div>

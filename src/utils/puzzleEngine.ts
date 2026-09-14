@@ -690,7 +690,7 @@ function createOptions(correct: number): string[] {
     .map(String);
 }
 
-// Daily / Hourly challenge deterministic seed
+// Daily Challenge deterministic seed (1-minute rotation cycle)
 export function getDailyChallenge(timestampOrDate?: number | string | Date): { puzzle: Puzzle; puzzleNumber: number } {
   const date = timestampOrDate instanceof Date
     ? timestampOrDate
@@ -700,9 +700,9 @@ export function getDailyChallenge(timestampOrDate?: number | string | Date): { p
     ? new Date(timestampOrDate)
     : new Date();
 
-  // Epoch hour count for deterministic 1-hour cycle
-  const epochHours = Math.floor(date.getTime() / (1000 * 60 * 60));
-  const puzzleNumber = 200 + (epochHours % 10000);
+  // Epoch minute count for deterministic 1-minute rotation cycle
+  const epochMinutes = Math.floor(date.getTime() / (1000 * 60));
+  const puzzleNumber = 200 + (epochMinutes % 100000);
 
   // Curated signature math questions with diverse concepts
   const challengePuzzles: Puzzle[] = [
@@ -804,12 +804,12 @@ export function getDailyChallenge(timestampOrDate?: number | string | Date): { p
     },
   ];
 
-  const selected = challengePuzzles[epochHours % challengePuzzles.length];
+  const selected = challengePuzzles[epochMinutes % challengePuzzles.length];
   return {
     puzzle: {
       ...selected,
       id: `challenge-${puzzleNumber}`,
-      subtitle: `🔥 HOURLY MATH CHALLENGE — Puzzle #${puzzleNumber}`,
+      subtitle: `🔥 DAILY MATH CHALLENGE — Puzzle #${puzzleNumber}`,
     },
     puzzleNumber,
   };

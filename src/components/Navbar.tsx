@@ -8,7 +8,6 @@ import {
   VolumeX,
   Crown,
   Zap,
-  Trophy,
   User,
   Home,
   Swords,
@@ -183,21 +182,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Gamepad2 className="w-3.5 h-3.5" />
             Mainboard
-          </button>
-          <button
-            id="nav-tab-leaderboard"
-            onClick={() => {
-              sound.playClick();
-              onSelectTab('leaderboard');
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              currentTab === 'leaderboard'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-            }`}
-          >
-            <Trophy className="w-3.5 h-3.5" />
-            Leaderboard
           </button>
           <button
             id="nav-tab-profile"
@@ -459,7 +443,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           sound.playClick();
           onSelectTab('home');
         }}
-        className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl transition-all cursor-pointer min-w-[80px] active:scale-95 ${
+        className={`flex flex-col items-center justify-center gap-1 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[100px] active:scale-95 ${
           currentTab === 'home'
             ? 'bg-indigo-600/30 border border-indigo-500/50 text-indigo-200 font-black shadow-md'
             : 'text-slate-400 hover:text-slate-200 border border-transparent font-bold'
@@ -470,30 +454,13 @@ export const Navbar: React.FC<NavbarProps> = ({
       </button>
 
       <button
-        id="btn-mobile-nav-ranks"
-        type="button"
-        onClick={() => {
-          sound.playClick();
-          onSelectTab('leaderboard');
-        }}
-        className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl transition-all cursor-pointer min-w-[80px] active:scale-95 ${
-          currentTab === 'leaderboard'
-            ? 'bg-indigo-600/30 border border-indigo-500/50 text-indigo-200 font-black shadow-md'
-            : 'text-slate-400 hover:text-slate-200 border border-transparent font-bold'
-        }`}
-      >
-        <Trophy className="w-5 h-5 shrink-0" />
-        <span className="text-[11px] font-black tracking-wide leading-normal whitespace-nowrap">Ranks</span>
-      </button>
-
-      <button
         id="btn-mobile-nav-profile"
         type="button"
         onClick={() => {
           sound.playClick();
           onSelectTab('profile');
         }}
-        className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl transition-all cursor-pointer min-w-[80px] active:scale-95 ${
+        className={`flex flex-col items-center justify-center gap-1 py-1.5 px-4 rounded-xl transition-all cursor-pointer min-w-[100px] active:scale-95 ${
           currentTab === 'profile'
             ? 'bg-indigo-600/30 border border-indigo-500/50 text-indigo-200 font-black shadow-md'
             : 'text-slate-400 hover:text-slate-200 border border-transparent font-bold'

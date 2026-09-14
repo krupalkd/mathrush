@@ -409,13 +409,7 @@ export const AuthModal: React.FC = () => {
               </div>
 
               {/* Divider */}
-              <div className="relative flex items-center justify-center my-0.5">
-                <div className="border-t border-slate-800 w-full" />
-                <span className="bg-slate-900 px-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  or with email
-                </span>
-                <div className="border-t border-slate-800 w-full" />
-              </div>
+              <div className="border-t border-slate-800 w-full my-1.5" />
 
               {/* Email Form */}
               <form onSubmit={handleSubmitEmail} className="space-y-2.5">

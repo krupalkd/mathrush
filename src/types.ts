@@ -65,25 +65,6 @@ export interface UserStats {
   reminderTime?: string;
 }
 
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  avatar: string;
-  score: number;
-  wins: number;
-  losses: number;
-  winRate: number; // percentage e.g. 78.5
-  timeSec?: number;
-  rank: number;
-  badge: string;
-  country: string;
-  level?: number;
-  isUser?: boolean;
-  isPro?: boolean;
-  status?: 'online' | 'in_game' | 'idle';
-  recentGain?: number;
-}
-
 export interface BattleOpponent {
   id: string;
   name: string;

@@ -11,19 +11,17 @@ interface HomeViewProps {
   onStartGame: (mode: GameMode, category?: PuzzleCategory) => void;
   onOpenDaily: () => void;
   onOpenBattle: () => void;
-  onOpenLeaderboard: () => void;
   onOpenProfile: () => void;
   onOpenPro: () => void;
 }
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
+const ROTATION_INTERVAL_MS = 60 * 1000;
 
 export const HomeView: React.FC<HomeViewProps> = ({
   stats,
   onStartGame,
   onOpenDaily,
   onOpenBattle,
-  onOpenLeaderboard,
   onOpenProfile,
   onOpenPro,
 }) => {
@@ -33,8 +31,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const { currentLevelXp, nextLevelXp, progressPercent } = getLevelProgress(stats.xp, stats.level);
 
   const lastTimestamp = stats.lastDailyCompletedTimestamp || 0;
-  const isCooldownActive = lastTimestamp > 0 && now - lastTimestamp < ONE_HOUR_MS;
-  const remainingCooldownMs = isCooldownActive ? ONE_HOUR_MS - (now - lastTimestamp) : 0;
+  const isCooldownActive = lastTimestamp > 0 && now - lastTimestamp < ROTATION_INTERVAL_MS;
+  const remainingCooldownMs = isCooldownActive ? ROTATION_INTERVAL_MS - (now - lastTimestamp) : 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,10 +60,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <span>The Daily Math Game</span>
           </div>
           <h1 className="text-base sm:text-2xl md:text-3xl font-black tracking-tight text-white font-['Outfit'] leading-snug">
-            Engage with daily puzzles, view real-time rankings, and challenge players globally.
+            Engage with daily puzzles and challenge players globally.
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
-            Solve fresh challenges (+10,000 XP), monitor live international solver leaderboards, and enter speed 1v1 duels.
+            Solve fresh challenges (+100,000 XP), sharpen your mental arithmetic, and enter speed 1v1 duels.
           </p>
         </div>
       </div>
@@ -80,7 +78,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div>
               <span className="font-black text-white text-xs sm:text-sm block">Save Your MathRush Progress</span>
               <span className="text-[11px] text-slate-300 font-medium">
-                Sync your XP, streaks, and global rank across Android and desktop.
+                Sync your XP, streaks, and achievements across Android and desktop.
               </span>
             </div>
           </div>
@@ -135,7 +133,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-300 pt-0.5">
               <span className="flex items-center gap-1 text-emerald-400 font-bold">
-                <Trophy className="w-3.5 h-3.5 text-emerald-400" /> Reward: +10,000 XP
+                <Trophy className="w-3.5 h-3.5 text-emerald-400" /> Reward: +100,000 XP
               </span>
               <span className="text-slate-500 hidden sm:inline">•</span>
               <span className="text-rose-300 flex items-center gap-1 font-bold">
@@ -144,7 +142,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <span className="text-slate-500 hidden sm:inline">•</span>
               <span className="text-amber-300 flex items-center gap-1 font-mono font-semibold">
                 <Hourglass className="w-3.5 h-3.5 text-amber-400" />
-                {isCooldownActive ? `Next: ${formatCooldown(remainingCooldownMs)}` : 'Hourly Rotation'}
+                {isCooldownActive ? `Next: ${formatCooldown(remainingCooldownMs)}` : '1-Min Rotation'}
               </span>
             </div>
           </div>
@@ -168,7 +166,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </>
             ) : (
               <>
-                <span>Solve Daily (+10k XP)</span>
+                <span>Solve Daily (+100k XP)</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -204,7 +202,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="space-y-2 mb-3">
               <p className="text-xs text-slate-300 font-medium line-clamp-2">
-                Speed Battle: Match with online players on the same puzzle. Win duels to claim <strong>+1,000 XP</strong>.
+                Speed Battle: Match with online players on the same puzzle. Win duels to claim <strong>+100,000 XP</strong>.
               </p>
 
               {/* Battle Record Summary Box */}
@@ -214,7 +212,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <Zap className="w-3 h-3 text-amber-400 fill-amber-400" /> Arena XP Earned:
                   </span>
                   <span className="font-black font-mono text-amber-400 text-xs">
-                    +{(stats.battleWins * 1000).toLocaleString()} XP
+                    +{(stats.battleWins * 100000).toLocaleString()} XP
                   </span>
                 </div>
 
@@ -231,7 +229,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs font-bold text-rose-400 group-hover:text-rose-300">
             <span className="flex items-center gap-1 font-mono">
               <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <strong className="text-white">+{(stats.battleWins * 1000).toLocaleString()} XP</strong>
+              <strong className="text-white">+{(stats.battleWins * 100000).toLocaleString()} XP</strong>
             </span>
             <span className="flex items-center gap-1 font-bold">
               Enter Duel <ArrowRight className="w-3.5 h-3.5" />

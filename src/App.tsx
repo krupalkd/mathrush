@@ -7,7 +7,6 @@ import { HomeView } from './components/HomeView';
 import { GameView } from './components/GameView';
 import { MathBattleView } from './components/MathBattleView';
 import { DailyChallengeView } from './components/DailyChallengeView';
-import { LeaderboardView } from './components/LeaderboardView';
 import { ProfileView } from './components/ProfileView';
 import { ResultsModal } from './components/ResultsModal';
 import { ProModal } from './components/ProModal';
@@ -69,7 +68,7 @@ function AppContent() {
           setSelectedCategory(category);
           setCurrentTab('game');
         },
-        'Sign in first to start gameplay, climb the leaderboards, and save your progress.'
+        'Sign in first to start gameplay and save your progress.'
       );
       return;
     }
@@ -176,7 +175,6 @@ function AppContent() {
             onStartGame={handleStartGame}
             onOpenDaily={handleOpenDaily}
             onOpenBattle={handleOpenBattle}
-            onOpenLeaderboard={() => setCurrentTab('leaderboard')}
             onOpenProfile={() => setCurrentTab('profile')}
             onOpenPro={() => setShowProModal(true)}
           />
@@ -233,13 +231,6 @@ function AppContent() {
               onBack={() => setCurrentTab('home')}
             />
           )
-        )}
-
-        {currentTab === 'leaderboard' && (
-          <LeaderboardView
-            stats={stats}
-            onOpenBattle={() => setCurrentTab('battle')}
-          />
         )}
 
         {currentTab === 'profile' && (

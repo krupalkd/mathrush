@@ -143,7 +143,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         // Immediate sample notification
         try {
           new Notification('🔥 MathRush Daily Streak Reminder Enabled!', {
-            body: `You're all set! We will remind you daily at ${stats.reminderTime || '9:00 AM'} to keep your ${stats.streak}-day streak alive and claim +10,000 XP.`,
+            body: `You're all set! We will remind you daily at ${stats.reminderTime || '9:00 AM'} to keep your ${stats.streak}-day streak alive and claim +100,000 XP.`,
             icon: '/favicon.ico',
           });
         } catch {
@@ -173,7 +173,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
       try {
         new Notification('⚡ MathRush Daily Puzzle Ready!', {
-          body: `Today's +10,000 XP challenge is live! Keep your ${stats.streak}-day streak intact.`,
+          body: `Today's +100,000 XP challenge is live! Keep your ${stats.streak}-day streak intact.`,
           icon: '/favicon.ico',
         });
         sound.playOptionSelect();
@@ -391,7 +391,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <span className="font-bold text-amber-300">
                   {stats.lives < stats.maxLives
                     ? `Next Heart in ${getRefillCountdown()}`
-                    : '100% Full Energy (5/5)'}
+                    : '100% Full Energy (3/3)'}
                 </span>
               </div>
 
@@ -447,7 +447,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
               <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-0.5">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Daily Reward</span>
-                <span className="text-sm font-black text-amber-300">+10,000 XP</span>
+                <span className="text-sm font-black text-amber-300">+100,000 XP</span>
               </div>
             </div>
 
@@ -496,11 +496,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Earn XP by completing daily math challenges (+10,000 XP) and winning 1v1 battle duels (+1,000 XP).
+              Earn XP by completing daily math challenges (+100,000 XP) and winning 1v1 battle duels (+100,000 XP).
             </p>
           </div>
 
-          {/* 4. 🔊 Volume & Master Audio Controls */}
+          {/* 4. 🔊 Master Audio Controls */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -516,7 +516,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   )}
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Game Audio & Volume</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Game Audio</span>
                   <div className="flex items-center gap-1.5">
                     <span className={`text-lg font-black ${
                       stats.soundEnabled !== false ? 'text-emerald-300' : 'text-rose-300'
@@ -531,13 +531,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <button
                 id="profile-master-sound-toggle"
                 onClick={handleToggleSound}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-black border transition-all active:scale-95 cursor-pointer shadow-sm ${
+                className={`px-3.5 py-2 min-h-[40px] rounded-xl text-xs font-black border transition-all active:scale-95 cursor-pointer shadow-sm shrink-0 whitespace-nowrap ${
                   stats.soundEnabled !== false
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500'
                     : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
                 }`}
               >
-                {stats.soundEnabled !== false ? '🔊 Mute Audio' : '🔈 Enable Sound'}
+                {stats.soundEnabled !== false ? '🔊 Mute' : '🔈 Enable'}
               </button>
             </div>
 
@@ -617,7 +617,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          {user ? (
+          {user && (
             <button
               onClick={() => {
                 sound.playClick();
@@ -628,80 +628,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
             </button>
-          ) : (
-            <button
-              onClick={() => {
-                sound.playClick();
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              }}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md shadow-indigo-600/30 flex items-center gap-2 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Sign In / Connect</span>
-            </button>
           )}
         </div>
-
-        {/* Quick Social Connect Bar if not signed in */}
-        {!user && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-            <button
-              onClick={() => {
-                sound.playClick();
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              }}
-              className="p-2.5 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>Google Sign-In</span>
-            </button>
-
-            <button
-              onClick={() => {
-                sound.playClick();
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              }}
-              className="p-2.5 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
-            >
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-              <span>Facebook Sign-In</span>
-            </button>
-
-            <button
-              onClick={() => {
-                sound.playClick();
-                setAuthModalMode('signin');
-                setAuthModalOpen(true);
-              }}
-              className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border border-slate-700"
-            >
-              <Mail className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Email Sign-In</span>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Start Process Fresh Card */}
@@ -772,29 +700,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 Daily Streak Reminders
               </h3>
               <p className="text-[11px] text-slate-400">
-                Receive browser notifications before your streak expires (+10,000 XP)
+                Receive browser notifications before your streak expires (+100,000 XP)
               </p>
             </div>
           </div>
 
           {/* Status Badge */}
           {permissionStatus === 'granted' && stats.notificationsEnabled ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
               <ShieldCheck className="w-3.5 h-3.5" />
               Active
             </span>
           ) : permissionStatus === 'granted' && !stats.notificationsEnabled ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-slate-800 text-slate-400 border border-slate-700">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-slate-800 text-slate-400 border border-slate-700 shrink-0">
               <BellOff className="w-3.5 h-3.5" />
               Paused
             </span>
           ) : permissionStatus === 'denied' ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">
               <AlertTriangle className="w-3.5 h-3.5" />
               Blocked
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
               <Sparkles className="w-3.5 h-3.5" />
               Not Configured
             </span>
@@ -837,7 +765,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           /* Granted Controls */
           <div className="space-y-3 pt-1">
             {/* Toggle Row */}
-            <div className="flex items-center justify-between text-xs bg-slate-950/80 border border-slate-800 rounded-xl p-3">
+            <div className="flex items-center justify-between text-xs bg-slate-950/80 border border-slate-800 rounded-xl p-3 gap-2">
               <div>
                 <span className="text-slate-200 font-bold block">Daily Notifications</span>
                 <span className="text-[11px] text-slate-400">
@@ -848,12 +776,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <button
                 id="btn-toggle-notifications"
                 onClick={handleToggleNotifications}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                className={`px-4 py-2 min-h-[40px] rounded-xl text-xs font-black border transition-all active:scale-95 cursor-pointer shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
                   stats.notificationsEnabled
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-slate-700'
                 }`}
               >
+                <span className={`w-2 h-2 rounded-full ${stats.notificationsEnabled ? 'bg-emerald-300 animate-pulse' : 'bg-slate-500'}`} />
                 {stats.notificationsEnabled ? 'Active' : 'Off'}
               </button>
             </div>
