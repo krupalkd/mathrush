@@ -5,26 +5,11 @@ import {
   INITIAL_GLOBAL_PLAYERS,
   GlobalPlayerTemplate,
   buildLeaderboardEntries,
-  LiveEventMessage,
 } from '../utils/leaderboardData';
-import confetti from 'canvas-confetti';
 import {
-  Trophy,
   Crown,
-  Flame,
-  Swords,
   Search,
-  Zap,
-  RefreshCw,
   Radio,
-  Clock,
-  Target,
-  Percent,
-  TrendingUp,
-  Shield,
-  Activity,
-  ArrowUpDown,
-  Users,
 } from 'lucide-react';
 
 interface LeaderboardViewProps {
@@ -32,50 +17,21 @@ interface LeaderboardViewProps {
   onOpenBattle?: () => void;
 }
 
-export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenBattle }) => {
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats }) => {
   const [tab, setTab] = useState<'alltime' | 'weekly' | 'daily' | 'battle'>('alltime');
-  const [sortBy, setSortBy] = useState<'score' | 'winrate' | 'speed'>('score');
   const [searchQuery, setSearchQuery] = useState('');
   const [players, setPlayers] = useState<GlobalPlayerTemplate[]>(INITIAL_GLOBAL_PLAYERS);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [connectedPlayerIds, setConnectedPlayerIds] = useState<Record<string, boolean>>({});
-  const [socialToast, setSocialToast] = useState<{ message: string; icon: string } | null>(null);
-  const [liveEvents, setLiveEvents] = useState<LiveEventMessage[]>([
-    {
-      id: 'ev-1',
-      playerName: 'Vikram Mehta',
-      avatar: '🧙‍♂️',
-      action: 'Won 1v1 Battle',
-      xpDelta: 1000,
-      timestamp: Date.now() - 4000,
-    },
-    {
-      id: 'ev-2',
-      playerName: 'Elena Rostov',
-      avatar: '🦊',
-      action: 'Solved Daily Quest',
-      xpDelta: 10000,
-      timestamp: Date.now() - 15000,
-    },
-  ]);
   const [recentGainPlayerId, setRecentGainPlayerId] = useState<string | null>(null);
 
   // Periodic real-time XP simulation for global competitors
   useEffect(() => {
     const liveInterval = setInterval(() => {
-      // Pick a random online/in_game player to earn XP or finish a battle
       const eligiblePlayers = players.filter((p) => p.status !== 'idle');
       if (eligiblePlayers.length === 0) return;
       const target = eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
 
       const isBattleWin = Math.random() > 0.35;
       const xpGain = isBattleWin ? (Math.random() > 0.7 ? 10000 : 1000) : 150;
-      const actionText =
-        xpGain === 10000
-          ? 'Solved Daily Quest (+10k XP)'
-          : isBattleWin
-          ? 'Won 1v1 Battle (+1,000 XP)'
-          : 'Completed Quick Rush (+150 XP)';
 
       setPlayers((prev) =>
         prev.map((p) => {
@@ -96,34 +52,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
 
       setRecentGainPlayerId(target.id);
       setTimeout(() => setRecentGainPlayerId(null), 2500);
-
-      // Add to live events feed
-      setLiveEvents((prev) => [
-        {
-          id: `ev-${Date.now()}`,
-          playerName: target.name,
-          avatar: target.avatar,
-          action: actionText,
-          xpDelta: xpGain,
-          timestamp: Date.now(),
-        },
-        ...prev.slice(0, 3),
-      ]);
     }, 4500);
 
     return () => clearInterval(liveInterval);
   }, [players]);
 
-  const handleManualRefresh = () => {
-    sound.playClick();
-    setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 600);
-  };
-
-  // Build unified real-time ranking with user's actual XP and Win/Loss
-  const { entries, userEntry } = buildLeaderboardEntries(players, stats, tab, sortBy);
+  // Build unified real-time ranking sorted by XP
+  const { entries, userEntry } = buildLeaderboardEntries(players, stats, tab, 'score');
 
   const filteredEntries = entries.filter((e) =>
     e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -134,13 +69,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
   const top1 = entries[0];
   const top2 = entries[1];
   const top3 = entries[2];
-
-  // Helper for win rate color badges
-  const getWinRateColor = (winRate: number) => {
-    if (winRate >= 75) return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
-    if (winRate >= 50) return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40';
-    return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 text-slate-100 space-y-6 pb-28 md:pb-16">
@@ -159,48 +87,17 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-white font-['Outfit'] mt-1">
-            Global XP & Battle Standings
+            Global XP Standings
           </h1>
           <p className="text-xs text-slate-400">
-            Real-time rankings with authentic XP, win/loss ratios, and live mathematical battle stats.
+            Real-time global rankings and authentic XP standings.
           </p>
         </div>
-
-        {/* Live Manual Refresh Action */}
-        <button
-          onClick={handleManualRefresh}
-          className="self-start sm:self-auto px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-          title="Refresh real-time standings"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-indigo-400' : ''}`} />
-          <span>Sync Real-Time XP</span>
-        </button>
       </div>
 
-      {/* Live Activity Feed Marquee */}
-      <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 overflow-hidden shadow-inner text-xs">
-        <div className="flex items-center gap-2 text-indigo-400 font-bold shrink-0">
-          <Activity className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="uppercase text-[10px] tracking-wider text-slate-400">Live Feed:</span>
-        </div>
-        <div className="flex-1 overflow-hidden truncate">
-          {liveEvents.length > 0 && (
-            <div className="flex items-center gap-2 text-slate-300 truncate">
-              <span className="text-sm">{liveEvents[0].avatar}</span>
-              <strong className="text-white">{liveEvents[0].playerName}</strong>
-              <span className="text-slate-400">{liveEvents[0].action}</span>
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-bold">
-                +{liveEvents[0].xpDelta.toLocaleString()} XP
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs & Sorting Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-2xl">
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
+      {/* Tabs Toolbar */}
+      <div className="flex items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-2xl">
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full">
           {(
             [
               { id: 'alltime', label: 'All-Time XP' },
@@ -225,52 +122,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
             </button>
           ))}
         </div>
-
-        {/* Sorting Dropdown / Pills */}
-        <div className="flex items-center gap-1.5 self-end md:self-auto text-xs">
-          <span className="text-slate-500 font-semibold flex items-center gap-1">
-            <ArrowUpDown className="w-3.5 h-3.5" /> Sort:
-          </span>
-          <button
-            onClick={() => {
-              sound.playClick();
-              setSortBy('score');
-            }}
-            className={`px-2.5 py-1.5 rounded-lg font-bold cursor-pointer transition-colors ${
-              sortBy === 'score'
-                ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {tab === 'battle' ? 'Arena XP' : 'Real XP'}
-          </button>
-          <button
-            onClick={() => {
-              sound.playClick();
-              setSortBy('winrate');
-            }}
-            className={`px-2.5 py-1.5 rounded-lg font-bold cursor-pointer transition-colors ${
-              sortBy === 'winrate'
-                ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-500/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Win/Loss Ratio (%)
-          </button>
-          <button
-            onClick={() => {
-              sound.playClick();
-              setSortBy('speed');
-            }}
-            className={`px-2.5 py-1.5 rounded-lg font-bold cursor-pointer transition-colors ${
-              sortBy === 'speed'
-                ? 'bg-amber-500/30 text-amber-200 border border-amber-500/50'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Speed
-          </button>
-        </div>
       </div>
 
       {/* Top 3 Podium Cards */}
@@ -289,15 +140,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
             <div className="inline-block px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px] font-extrabold text-slate-300">
               🥈 Rank #2
             </div>
-            <span className="text-sm font-mono font-black text-indigo-300 block">
+            <span className="text-sm font-mono font-black text-indigo-300 block pt-1">
               {top2.score.toLocaleString()} XP
             </span>
-            <div className="pt-1 border-t border-slate-800 text-[10px] text-slate-400 flex flex-col items-center gap-0.5">
-              <span className="font-bold text-emerald-400">
-                {top2.wins}W - {top2.losses}L
-              </span>
-              <span className="text-slate-400 font-mono">({top2.winRate}% Win Rate)</span>
-            </div>
           </div>
 
           {/* 1st Place (Center & Champion Crown) */}
@@ -316,15 +161,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
             <div className="inline-block px-2.5 py-0.5 bg-amber-500 text-slate-950 rounded-full text-[10px] font-black uppercase tracking-wider">
               👑 Champion #1
             </div>
-            <span className="text-base sm:text-lg font-mono font-black text-amber-400 block">
+            <span className="text-base sm:text-lg font-mono font-black text-amber-400 block pt-1">
               {top1.score.toLocaleString()} XP
             </span>
-            <div className="pt-1.5 border-t border-amber-500/20 text-[11px] flex flex-col items-center gap-0.5">
-              <span className="font-extrabold text-emerald-400">
-                {top1.wins}W - {top1.losses}L
-              </span>
-              <span className="text-amber-300 font-mono font-bold">({top1.winRate}% Win Rate)</span>
-            </div>
           </div>
 
           {/* 3rd Place */}
@@ -340,15 +179,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
             <div className="inline-block px-2 py-0.5 bg-amber-900/40 border border-amber-700/40 text-amber-400 rounded text-[10px] font-extrabold">
               🥉 Rank #3
             </div>
-            <span className="text-sm font-mono font-black text-indigo-300 block">
+            <span className="text-sm font-mono font-black text-indigo-300 block pt-1">
               {top3.score.toLocaleString()} XP
             </span>
-            <div className="pt-1 border-t border-slate-800 text-[10px] text-slate-400 flex flex-col items-center gap-0.5">
-              <span className="font-bold text-emerald-400">
-                {top3.wins}W - {top3.losses}L
-              </span>
-              <span className="text-slate-400 font-mono">({top3.winRate}% Win Rate)</span>
-            </div>
           </div>
         </div>
       )}
@@ -365,32 +198,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
         />
       </div>
 
-      {/* Social Connection Toast Alert */}
-      {socialToast && (
-        <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-amber-950 border-2 border-indigo-400 rounded-xl p-3 shadow-2xl flex items-center justify-between gap-3 animate-bounce">
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-indigo-300">
-            <span className="text-xl">{socialToast.icon}</span>
-            <span>{socialToast.message}</span>
-          </div>
-          <button
-            onClick={() => setSocialToast(null)}
-            className="text-xs text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
       {/* Real-time Global Leaderboard Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         {/* Table Column Headers */}
         <div className="hidden sm:grid grid-cols-12 gap-2 px-4 py-3 bg-slate-950/90 border-b border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-          <div className="col-span-1 text-center">Rank</div>
-          <div className="col-span-4">Player & Country</div>
-          <div className="col-span-2 text-center">Win / Loss & Rate</div>
-          <div className="col-span-2 text-center">Avg Speed</div>
+          <div className="col-span-2 text-center">Rank</div>
+          <div className="col-span-7">Player & Country</div>
           <div className="col-span-3 text-right">
-            {tab === 'battle' ? 'Arena XP & Connect' : 'Real XP & Connect'}
+            {tab === 'battle' ? 'Arena XP' : 'Total XP'}
           </div>
         </div>
 
@@ -398,16 +213,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
           {filteredEntries.map((player) => {
             const isUserRow = player.isUser;
             const hasRecentGain = recentGainPlayerId === player.id;
-            const isConnected = !!connectedPlayerIds[player.id];
-            const winLossRatioVal =
-              player.losses > 0
-                ? (player.wins / player.losses).toFixed(2)
-                : player.wins.toFixed(1);
 
             return (
               <div
                 key={player.id}
-                className={`p-3.5 sm:px-4 sm:py-3.5 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:items-center transition-all ${
+                className={`p-3 sm:px-4 sm:py-3.5 transition-all ${
                   isUserRow
                     ? 'bg-indigo-950/50 border-l-4 border-indigo-500 hover:bg-indigo-950/70'
                     : hasRecentGain
@@ -415,10 +225,67 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
                     : 'hover:bg-slate-800/40'
                 }`}
               >
-                {/* Mobile Top Row / Rank & Player */}
-                <div className="flex items-center justify-between sm:contents">
+                {/* Mobile View */}
+                <div className="flex sm:hidden items-center justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs font-mono shrink-0 ${
+                        player.rank === 1
+                          ? 'bg-amber-500 text-slate-950'
+                          : player.rank === 2
+                          ? 'bg-slate-300 text-slate-950'
+                          : player.rank === 3
+                          ? 'bg-amber-700 text-white'
+                          : isUserRow
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-slate-800 text-slate-400'
+                      }`}
+                    >
+                      #{player.rank}
+                    </span>
+
+                    <div className="relative shrink-0">
+                      <span className="text-xl">{player.avatar}</span>
+                      {player.status === 'online' && (
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full border-2 border-slate-900 absolute -bottom-0.5 -right-0.5" />
+                      )}
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-xs text-white truncate">
+                          {player.name}
+                        </span>
+                        {isUserRow && (
+                          <span className="px-1.5 py-0.2 bg-indigo-500 text-white text-[9px] font-black rounded uppercase">
+                            YOU
+                          </span>
+                        )}
+                        {player.isPro && (
+                          <span className="px-1 py-0.2 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-black rounded flex items-center gap-0.5 shadow-sm">
+                            <Crown className="w-2.5 h-2.5 fill-slate-950" />
+                            <span>PRO</span>
+                          </span>
+                        )}
+                        <span className="text-[11px]">{player.country}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 block truncate">
+                        {player.badge} • Lvl {player.level || 1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-right font-mono shrink-0">
+                    <span className="font-black text-sm text-amber-400 block">
+                      {player.score.toLocaleString()} XP
+                    </span>
+                  </div>
+                </div>
+
+                {/* Desktop Grid (sm+) */}
+                <div className="hidden sm:grid sm:grid-cols-12 gap-2 items-center">
                   {/* Rank Column */}
-                  <div className="sm:col-span-1 flex items-center justify-start sm:justify-center">
+                  <div className="col-span-2 flex items-center justify-center">
                     <span
                       className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs font-mono ${
                         player.rank === 1
@@ -437,7 +304,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
                   </div>
 
                   {/* Player Info Column */}
-                  <div className="sm:col-span-4 flex items-center gap-2.5">
+                  <div className="col-span-7 flex items-center gap-2.5">
                     <div className="relative">
                       <span className="text-xl sm:text-2xl">{player.avatar}</span>
                       {player.status === 'online' && (
@@ -468,127 +335,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
                     </div>
                   </div>
 
-                  {/* Mobile-only Score Display & Quick Connect */}
-                  <div className="sm:hidden text-right font-mono flex flex-col items-end gap-1">
-                    <span className="font-black text-base text-amber-400 block">
-                      {player.score.toLocaleString()} XP
-                    </span>
-                    {!isUserRow && (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            sound.playCorrect();
-                            setConnectedPlayerIds((prev) => ({ ...prev, [player.id]: true }));
-                            setSocialToast({
-                              message: `Connected with ${player.name} ${player.country}! High-five sent 👋`,
-                              icon: '🤝',
-                            });
-                            confetti({ particleCount: 20, spread: 45 });
-                          }}
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all cursor-pointer ${
-                            isConnected
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                              : 'bg-indigo-600/30 text-indigo-300 border-indigo-500/40 hover:bg-indigo-600/60'
-                          }`}
-                        >
-                          {isConnected ? '🤝 Connected' : '👋 Connect'}
-                        </button>
-                        {onOpenBattle && (
-                          <button
-                            onClick={() => {
-                              sound.playClick();
-                              onOpenBattle();
-                            }}
-                            className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-600 text-white hover:bg-rose-500 transition-all cursor-pointer"
-                          >
-                            ⚔️ Duel
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Win / Loss Ratio Column */}
-                <div className="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2 pt-1 sm:pt-0">
-                  <span className="sm:hidden text-[11px] text-slate-400 font-semibold">
-                    Win / Loss:
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-mono font-bold text-slate-200">
-                      <strong className="text-emerald-400">{player.wins}W</strong> -{' '}
-                      <strong className="text-rose-400">{player.losses}L</strong>
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-extrabold border font-mono ${getWinRateColor(
-                        player.winRate
-                      )}`}
-                      title={`Ratio: ${winLossRatioVal}`}
-                    >
-                      {player.winRate}% Win
-                    </span>
-                  </div>
-                </div>
-
-                {/* Avg Speed Column */}
-                <div className="sm:col-span-2 flex items-center justify-between sm:justify-center gap-1 text-xs text-slate-400 font-mono">
-                  <span className="sm:hidden text-[11px] text-slate-400 font-semibold">
-                    Speed:
-                  </span>
-                  <span className="flex items-center gap-1 text-indigo-300 font-semibold">
-                    <Clock className="w-3 h-3 text-indigo-400" />
-                    {player.timeSec || 5.0}s
-                  </span>
-                </div>
-
-                {/* Real XP Score & Connect Column */}
-                <div className="hidden sm:flex sm:col-span-3 items-center justify-end gap-2 font-mono">
-                  <div className="text-right">
+                  {/* Real XP Score Column */}
+                  <div className="col-span-3 text-right font-mono">
                     <span className="font-black text-sm text-white block">
                       {player.score.toLocaleString()} XP
                     </span>
-                    <span className="text-[10px] text-slate-400">
-                      Ratio: {winLossRatioVal}
-                    </span>
                   </div>
-
-                  {!isUserRow && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          sound.playCorrect();
-                          setConnectedPlayerIds((prev) => ({ ...prev, [player.id]: true }));
-                          setSocialToast({
-                            message: `Connected with ${player.name} ${player.country}! High-five sent 👋`,
-                            icon: '🤝',
-                          });
-                          confetti({ particleCount: 25, spread: 50 });
-                        }}
-                        className={`p-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                          isConnected
-                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                            : 'bg-slate-800 text-indigo-300 border-slate-700 hover:bg-indigo-600 hover:text-white'
-                        }`}
-                        title={isConnected ? 'Connected' : 'Send high-five & connect'}
-                      >
-                        {isConnected ? '🤝' : '👋'}
-                      </button>
-
-                      {onOpenBattle && (
-                        <button
-                          onClick={() => {
-                            sound.playClick();
-                            onOpenBattle();
-                          }}
-                          className="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 transition-all cursor-pointer flex items-center gap-1"
-                          title={`Challenge ${player.name} to 1v1 Math Battle`}
-                        >
-                          <Swords className="w-3 h-3" />
-                          <span>Duel</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -620,32 +372,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ stats, onOpenB
             </div>
           </div>
 
-          {/* User Real Stats Bar: Real XP & Win/Loss Ratio */}
-          <div className="flex items-center gap-4 sm:gap-6 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-indigo-500/30 self-stretch sm:self-auto justify-between sm:justify-end font-mono">
-            {/* W/L Ratio */}
-            <div className="text-left sm:text-right">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">
-                Win / Loss Record
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-black text-white">
-                  <strong className="text-emerald-400">{userEntry.wins}W</strong> -{' '}
-                  <strong className="text-rose-400">{userEntry.losses}L</strong>
-                </span>
-                <span
-                  className={`px-1.5 py-0.2 rounded text-[10px] font-black border ${getWinRateColor(
-                    userEntry.winRate
-                  )}`}
-                >
-                  {userEntry.winRate}% Win Rate
-                </span>
-              </div>
-            </div>
-
-            {/* Real Total XP */}
+          {/* User Real Stats Bar: Real XP */}
+          <div className="flex items-center gap-4 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-indigo-500/30 self-stretch sm:self-auto justify-end font-mono">
             <div className="text-right">
               <span className="text-[10px] text-slate-400 uppercase font-bold block">
-                {tab === 'battle' ? 'Arena XP' : 'Real-Time XP'}
+                {tab === 'battle' ? 'Arena XP' : 'Total Standings XP'}
               </span>
               <span className="text-base sm:text-lg font-black text-amber-400 block">
                 {userEntry.score.toLocaleString()} XP
